@@ -1,6 +1,7 @@
 #include <colorBase/colorBase.h>
 #include <stdio.h>
-
+#include <TimerEvents/TimerEvents.h>
+#include <windows.h>
 void rgb_unit_test()
 {
     using namespace std;
@@ -33,21 +34,28 @@ private:
     
 
 };
+
+void test(void *arg)
+{
+    printf("test\n");
+
+}
 int main(int argc, char *argv[])
 {
     {
         using namespace std;
         using namespace colorBase;
-        Color<colorType::RGB> rgb;
+        Color<colorType::RGB> rgb(123, 234, 122);
         Color<colorType::HSV> hsv;
         Color<colorType::CW> cw;
         Color<colorType::CCTB> cctb;
         rgb_unit_test();
         cw_unit_test();
-        test a;
-        a.color.setColor(rgb);
-        
 
+        TimerEvents::TimerEvents timer(true, 1000, test, nullptr); // Fire every 1000ms (1 second)
+        timer.Execute();
+        
+        Sleep(1000000);
     }
 
 }

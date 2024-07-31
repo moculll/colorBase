@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <functional>
 namespace colorBase {
 
 /**
@@ -14,8 +15,8 @@ enum class colorType {
     HSV,
     CW,
     CCTB
-};
-/* enum class colorType */
+}; /* enum class colorType */
+
 
 template <colorType>
 struct Color;
@@ -86,8 +87,8 @@ struct Color<colorType::CCTB> {
     Color(uint16_t cct, uint16_t b) : val{cct, b} {}
     Color() : val{0, 0} {}
 
-};
-/* struct Color */
+}; /* struct Color */
+
 
 
 enum class colorEffectMode {
@@ -96,24 +97,32 @@ enum class colorEffectMode {
     BRIGHTNESSLOOP,
     RANDOM,
     LINEAR,
-};
+}; /* enum class colorEffectMode */
 
 template <colorType T>
 struct colorEffectVal {
+    colorEffectMode mode;
+
     uint16_t linearStep;
     Color<T> target;
-    colorEffectMode mode;
+    
+
     colorEffectVal() : linearStep(0), mode(colorEffectMode::NORMAL) {}
-};
-/* struct colorEffectVal */
+}; /* struct colorEffectVal */
+
+template <colorType T>
+using hookCallback = std::function<void(Color<T>&)>;
 
 template <colorType T>
 struct colorMgr {
     Color<T> color;
+    /* implement your actual light device's color setting callback */
+    hookCallback<T> cbImpl;
     colorEffectVal<T> effectVal;
 
-};
-/* struct colorMgr */
+    colorMgr() : cbImpl(NULL) {};
+}; /* struct colorMgr */
+
 
 namespace effects {
 void convert(const Color<colorType::RGB> &src, Color<colorType::HSV> &tar);
@@ -132,32 +141,69 @@ public:
     colorBaseMgr(colorType mode): colorMode(mode) {}
 
     
+    
     void setColor(Color<colorType::RGB> &src)
     {
+        this->colorMode = colorType::RGB;
         this->rgb.color = src;
+        if(this->rgb.cbImpl)
+            this->rgb.cbImpl(src);
     }
     void setColor(Color<colorType::HSV> &src)
     {
+        this->colorMode = colorType::HSV;
         this->hsv.color = src;
+        if(this->hsv.cbImpl)
+            this->hsv.cbImpl(src);
     }
     void setColor(Color<colorType::CCTB> &src)
     {
+        this->colorMode = colorType::CCTB;
         this->cctb.color = src;
+        if(this->cctb.cbImpl)
+            this->cctb.cbImpl(src);
     }
     void setColor(Color<colorType::CW> &src)
     {
+        this->colorMode = colorType::CW;
         this->cw.color = src;
+        if(this->cw.cbImpl)
+            this->cw.cbImpl(src);
     }
 
+    void setColorCallback(hookCallback<colorType::RGB> cb)
+    {
+        this->rgb.cbImpl = cb;
+    }
+    void setColorCallback(hookCallback<colorType::HSV> cb)
+    {
+        this->hsv.cbImpl = cb;
+    }
+    void setColorCallback(hookCallback<colorType::CCTB> cb)
+    {
+        this->cctb.cbImpl = cb;
+    }
+    void setColorCallback(hookCallback<colorType::CW> cb)
+    {
+        this->cw.cbImpl = cb;
+    }
+
+    void startColorLoop(void *arg)
+    {
+        
+    }
+    
 private:
     colorType colorMode;
     colorMgr<colorType::RGB> rgb;
     colorMgr<colorType::HSV> hsv;
     colorMgr<colorType::CCTB> cctb;
     colorMgr<colorType::CW> cw;
+    
 
-};
-/* class colorBaseMgr */
+
+}; /* class colorBaseMgr */
+
 
 
 
