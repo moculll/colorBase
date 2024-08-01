@@ -5,7 +5,7 @@
 #if COLORBASEPORT_PRINT
 #define CBD_PRINT(format, ...) \
             do { \
-                printf("[colorBasePort][%s]: " format "\r\n", __func__, ##__VA_ARGS__); \
+                printf("[%s %d][%s]: " format "\r\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
             } while(0)
 #else
 #define CBD_PRINT(format, ...)
@@ -49,7 +49,6 @@ void colorBasePortMgr::initImpl(colorBaseMgr &mgr)
     mgr.setColorCallback(colorCallbackImpl<colorType::HSV>);
     mgr.setColorCallback(colorCallbackImpl<colorType::CCTB>);
     mgr.setColorCallback(colorCallbackImpl<colorType::CW>);
-
 
 }
 
