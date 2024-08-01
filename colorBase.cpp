@@ -124,5 +124,37 @@ void convert(const Color<colorType::CW> &src, Color<colorType::CCTB> &tar)
 }
 
 } /* effects */
+
+
+template <>
+void colorBaseMgr::colorLoopCallback<colorType::HSV>(void *arg)
+{
+    colorBaseMgr *mgr = (colorBaseMgr *)arg;
+    
+    mgr->hsv.color.val.h = (mgr->hsv.effectVal.loopDirection ? \
+                        (mgr->hsv.color.val.h >= 360 ? 0 : mgr->hsv.color.val.h + 1) : (mgr->hsv.color.val.h <= 0 ? 360 : mgr->hsv.color.val.h - 1)
+                        );
+    
+    mgr->setColor(mgr->hsv.color);
+    mgr->timer.execute();
+}
+
+template <>
+void colorBaseMgr::startColorLoop<colorType::HSV>(uint16_t loopMs)
+{
+    using colorLoopCallbackType = void (*)(void *);
+    this->colorMode = colorType::RGB;
+    this->effectMode = colorEffectMode::COLORLOOP;
+    this->hsv.effectVal.loopDirection = 1;
+    this->hsv.effectVal.loopMs = loopMs;
+    timer.stopExecute();
+    timer.setType(0);
+    timer.setExecuteTime((this->hsv.effectVal.loopMs / 360) > 0 ? (this->hsv.effectVal.loopMs / 360) : 1);
+    timer.setObj((void *)this);
+    timer.setCallback(reinterpret_cast<colorLoopCallbackType>(colorBaseMgr::colorLoopCallback<colorType::HSV>));
+    
+    timer.execute();
+}
+
 } /* colorBase */
 

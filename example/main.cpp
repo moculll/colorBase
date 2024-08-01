@@ -26,9 +26,9 @@ void cw_unit_test()
 
 }
 
-class test {
+class testcl {
 public:
-    test(){}
+    testcl(){}
     colorBase::colorBaseMgr color;
 private:
     
@@ -51,9 +51,10 @@ int main(int argc, char *argv[])
         Color<colorType::CCTB> cctb;
         rgb_unit_test();
         cw_unit_test();
-
-        TimerEvents::TimerEvents timer(true, 1000, test, nullptr); // Fire every 1000ms (1 second)
-        timer.Execute();
+        testcl testclass;
+        testclass.color.startColorLoop<colorType::HSV>(100);
+        /* TimerEvents::TimerEvents timer(true, 1000, test, nullptr); // Fire every 1000ms (1 second)
+        timer.Execute(); */
         
         Sleep(1000000);
     }

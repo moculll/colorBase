@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <functional>
+#define COLORBASE_DEBUG_PRINT 1
 namespace colorBase {
 
 /**
@@ -101,14 +102,18 @@ enum class colorEffectMode {
 
 template <colorType T>
 struct colorEffectVal {
-    colorEffectMode mode;
+    
 
     uint16_t linearStep;
+    uint8_t loopDirection;
+    uint16_t loopMs;
     Color<T> target;
     
 
-    colorEffectVal() : linearStep(0), mode(colorEffectMode::NORMAL) {}
+    colorEffectVal() : linearStep(0) {}
 }; /* struct colorEffectVal */
+
+
 
 template <colorType T>
 using hookCallback = std::function<void(Color<T>&)>;
@@ -133,7 +138,7 @@ void convert(const Color<colorType::CW> &src, Color<colorType::CCTB> &tar);
 } /* effects */
 
 
-
+#include <TimerEvents/TimerEvents.h>
 class colorBaseMgr {
 
 public:
@@ -146,6 +151,9 @@ public:
     {
         this->colorMode = colorType::RGB;
         this->rgb.color = src;
+#if COLORBASE_DEBUG_PRINT
+        printf("set color: %d %d %d\n", this->rgb.color.val.r, this->rgb.color.val.g, this->rgb.color.val.b);
+#endif
         if(this->rgb.cbImpl)
             this->rgb.cbImpl(src);
     }
@@ -153,6 +161,9 @@ public:
     {
         this->colorMode = colorType::HSV;
         this->hsv.color = src;
+#if COLORBASE_DEBUG_PRINT
+        printf("set color: %d %d %d\n", this->hsv.color.val.h, this->hsv.color.val.s, this->hsv.color.val.v);
+#endif
         if(this->hsv.cbImpl)
             this->hsv.cbImpl(src);
     }
@@ -160,6 +171,9 @@ public:
     {
         this->colorMode = colorType::CCTB;
         this->cctb.color = src;
+#if COLORBASE_DEBUG_PRINT
+        printf("set color: %d %d %d\n", this->cctb.color.val.cct, this->cctb.color.val.b);
+#endif
         if(this->cctb.cbImpl)
             this->cctb.cbImpl(src);
     }
@@ -167,6 +181,9 @@ public:
     {
         this->colorMode = colorType::CW;
         this->cw.color = src;
+#if COLORBASE_DEBUG_PRINT
+        printf("set color: %d %d %d\n", this->cw.color.val.c, this->cw.color.val.w);
+#endif
         if(this->cw.cbImpl)
             this->cw.cbImpl(src);
     }
@@ -188,18 +205,21 @@ public:
         this->cw.cbImpl = cb;
     }
 
-    void startColorLoop(void *arg)
-    {
-        
-    }
+    template <colorType>
+    static void colorLoopCallback(void *arg);
+    
+    template <colorType>
+    void startColorLoop(uint16_t loopMs);
     
 private:
     colorType colorMode;
+    colorEffectMode effectMode;
     colorMgr<colorType::RGB> rgb;
     colorMgr<colorType::HSV> hsv;
     colorMgr<colorType::CCTB> cctb;
     colorMgr<colorType::CW> cw;
     
+    TimerEvents::TimerEvents timer;
 
 
 }; /* class colorBaseMgr */

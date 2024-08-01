@@ -17,33 +17,38 @@ public:
             timerType = TIME_ONESHOT;
         }
     }
-
+    TimerEvents() {}
     ~TimerEvents() {
-        StopExecute();
+        stopExecute();
     }
-
-    bool SetCallback(timer_events_handler_t _handler) {
+    void setObj(void *arg)
+    {
+        objectPtr = arg;
+    }
+    void setType(uint16_t type){
+        timerType = type;
+    }
+    bool setCallback(timer_events_handler_t _handler) {
         handler = _handler;
         return true;
     }
 
-    bool SetExecuteTime(uint32_t _executeTime) {
+    bool setExecuteTime(uint32_t _executeTime) {
         executeTime = _executeTime;
-        setTimer(executeTime, timerType);
         return true;
     }
 
-    bool Execute() {
+    bool execute() {
         runningStatus = true;
         setTimer(executeTime, timerType);
         return true;
     }
 
-    bool StopExecute() {
+    bool stopExecute() {
         runningStatus = false;
-        if (timerID != NULL) {
+        if (timerID) {
             timeKillEvent(timerID);
-            timerID = NULL;
+            timerID = 0;
         }
         return true;
     }
@@ -53,6 +58,14 @@ public:
         return 0;
     }
 
+    void setTimer(int intervalMs, UINT type) {
+        timeKillEvent(timerID);
+
+        timerID = timeSetEvent(intervalMs * 1000, 0, reinterpret_cast<LPTIMECALLBACK>(&TimerEvents::StaticTimerCallback), reinterpret_cast<DWORD_PTR>(this), type);
+        if (!timerID) {
+            return;
+        }
+    }
 private:
     uint32_t executeTime;
     timer_events_handler_t handler;
@@ -61,14 +74,7 @@ private:
     bool runningStatus;
     UINT timerID;
 
-    void setTimer(int intervalMs, UINT type) {
-        timeKillEvent(timerID);
-
-        timerID = timeSetEvent(intervalMs, 0, reinterpret_cast<LPTIMECALLBACK>(&TimerEvents::StaticTimerCallback), reinterpret_cast<DWORD_PTR>(this), type);
-        if (timerID == NULL) {
-
-        }
-    }
+    
 
     static void CALLBACK StaticTimerCallback(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2) {
         TimerEvents* timerInstance = reinterpret_cast<TimerEvents*>(dwUser);
