@@ -61,7 +61,7 @@ public:
     void setTimer(int intervalMs, UINT type) {
         timeKillEvent(timerID);
 
-        timerID = timeSetEvent(intervalMs * 1000, 0, reinterpret_cast<LPTIMECALLBACK>(&TimerEvents::StaticTimerCallback), reinterpret_cast<DWORD_PTR>(this), type);
+        timerID = timeSetEvent(intervalMs, 0, reinterpret_cast<LPTIMECALLBACK>(&TimerEvents::StaticTimerCallback), reinterpret_cast<DWORD_PTR>(this), type);
         if (!timerID) {
             return;
         }

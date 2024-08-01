@@ -106,12 +106,14 @@ struct colorEffectVal {
     
 
     uint16_t linearStep;
+    uint16_t linearIntervalMs;
+    uint16_t linearMs;
     uint8_t loopDirection;
     uint16_t loopMs;
     Color<T> target;
     
 
-    colorEffectVal() : linearStep(0) {}
+    colorEffectVal() : linearStep(0), linearIntervalMs(10), linearMs(1000) {}
 }; /* struct colorEffectVal */
 
 
@@ -122,6 +124,7 @@ using hookCallback = std::function<void(Color<T>&)>;
 template <colorType T>
 struct colorMgr {
     Color<T> color;
+    Color<T> prevColor;
     /* implement your actual light device's color setting callback in colorBasePort.cpp */
     hookCallback<T> cbImpl;
     colorEffectVal<T> effectVal;
@@ -144,7 +147,7 @@ void convert(const Color<colorType::CW> &src, Color<colorType::CCTB> &tar);
 
 
 class colorBaseMgr {
-
+    friend class colorBasePortMgr;
 public:
     colorBaseMgr(): colorMode(colorType::RGB) {
         portMgr.initImpl(*this);
@@ -153,34 +156,36 @@ public:
         portMgr.initImpl(*this);
     }
 
-    
-    
-    void setColor(Color<colorType::RGB> &src)
+    inline void setColor(Color<colorType::RGB> &src)
     {
+        this->portMgr.timer.stopExecute();
         this->colorMode = colorType::RGB;
         this->effectMode = colorEffectMode::NORMAL;
         this->rgb.color = src;
 
         this->rgb.cbImpl(src);
     }
-    void setColor(Color<colorType::HSV> &src)
+    inline void setColor(Color<colorType::HSV> &src)
     {
+        this->portMgr.timer.stopExecute();
         this->colorMode = colorType::HSV;
         this->effectMode = colorEffectMode::NORMAL;
         this->hsv.color = src;
 
         this->hsv.cbImpl(src);
     }
-    void setColor(Color<colorType::CCTB> &src)
+    inline void setColor(Color<colorType::CCTB> &src)
     {
+        this->portMgr.timer.stopExecute();
         this->colorMode = colorType::CCTB;
         this->effectMode = colorEffectMode::NORMAL;
         this->cctb.color = src;
 
         this->cctb.cbImpl(src);
     }
-    void setColor(Color<colorType::CW> &src)
+    inline void setColor(Color<colorType::CW> &src)
     {
+        this->portMgr.timer.stopExecute();
         this->colorMode = colorType::CW;
         this->effectMode = colorEffectMode::NORMAL;
         this->cw.color = src;
@@ -188,39 +193,88 @@ public:
         this->cw.cbImpl(src);
     }
 
-    void setColorCallback(hookCallback<colorType::RGB> cb)
+    inline void setColorInternal(Color<colorType::RGB> &src)
     {
-        this->rgb.cbImpl = cb;
+        this->rgb.color = src;
+        this->rgb.cbImpl(src);
     }
-    void setColorCallback(hookCallback<colorType::HSV> cb)
+    inline void setColorInternal(Color<colorType::HSV> &src)
     {
-        this->hsv.cbImpl = cb;
+        this->hsv.color = src;
+        this->hsv.cbImpl(src);
     }
-    void setColorCallback(hookCallback<colorType::CCTB> cb)
+    inline void setColorInternal(Color<colorType::CCTB> &src)
     {
-        this->cctb.cbImpl = cb;
+        this->cctb.color = src;
+        this->cctb.cbImpl(src);
     }
-    void setColorCallback(hookCallback<colorType::CW> cb)
+    inline void setColorInternal(Color<colorType::CW> &src)
     {
-        this->cw.cbImpl = cb;
+        this->cw.color = src;
+        this->cw.cbImpl(src);
     }
 
+
+    void setOnoff(bool onoff);
+    
+    
+    void setOnoffLinear(bool onoff);
+    
+
+    
+    /* color linear */
+    void setColorLinear(Color<colorType::RGB> &src);
+    void setColorLinear(Color<colorType::HSV> &src);
+    void setColorLinear(Color<colorType::CCTB> &src);
+    void setColorLinear(Color<colorType::CW> &src);
+    void startColorLinear(Color<colorType::RGB> &tar);
+    void startColorLinear(Color<colorType::HSV> &tar);
+    void startColorLinear(Color<colorType::CCTB> &tar);
+    void startColorLinear(Color<colorType::CW> &tar);
+
+    template <colorType>
+    static void colorLinearCallback(void *arg);
+
+
+    /* color loop */
     template <colorType>
     static void colorLoopCallback(void *arg);
-    
     template <colorType>
     void startColorLoop(uint16_t loopMs);
     
+    
+    
+
+   
 private:
+    
     colorType colorMode;
+    bool onoff;
     colorEffectMode effectMode;
     colorMgr<colorType::RGB> rgb;
     colorMgr<colorType::HSV> hsv;
     colorMgr<colorType::CCTB> cctb;
     colorMgr<colorType::CW> cw;
     
+    /* colorBasePort.cpp */
     colorBasePortMgr portMgr;
-
+    /* internal setcolor callback impl for port */
+    inline void setColorCallback(hookCallback<colorType::RGB> cb)
+    {
+        this->rgb.cbImpl = cb;
+    }
+    inline void setColorCallback(hookCallback<colorType::HSV> cb)
+    {
+        this->hsv.cbImpl = cb;
+    }
+    inline void setColorCallback(hookCallback<colorType::CCTB> cb)
+    {
+        this->cctb.cbImpl = cb;
+    }
+    inline void setColorCallback(hookCallback<colorType::CW> cb)
+    {
+        this->cw.cbImpl = cb;
+    }
 
 }; /* class colorBaseMgr */
 

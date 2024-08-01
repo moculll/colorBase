@@ -49,10 +49,20 @@ int main(int argc, char *argv[])
         Color<colorType::HSV> hsv;
         Color<colorType::CW> cw;
         Color<colorType::CCTB> cctb;
-        rgb_unit_test();
-        cw_unit_test();
+/*         rgb_unit_test();
+        cw_unit_test(); */
         testcl testclass;
-        testclass.color.startColorLoop<colorType::HSV>(100);
+/*         testclass.color.startColorLoop<colorType::HSV>(3600); */
+        testclass.color.startColorLinear(rgb);
+        Sleep(100);
+        testclass.color.setOnoffLinear(true);
+        Sleep(100);
+        testclass.color.setOnoffLinear(true);
+
+        Sleep(1000);
+        testclass.color.setOnoffLinear(false);
+        Sleep(1000);
+        testclass.color.setOnoffLinear(true);
         /* TimerEvents::TimerEvents timer(true, 1000, test, nullptr); // Fire every 1000ms (1 second)
         timer.Execute(); */
         

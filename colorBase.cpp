@@ -1,6 +1,15 @@
 #include <colorBase/colorBase.h>
 #include <algorithm>
 
+#define COLORBASE_PRINT 1
+#if COLORBASE_PRINT
+#define CB_PRINT(format, ...) \
+            do { \
+                printf("[%s %d][%s]: " format "\r\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
+            } while(0)
+#else
+#define CB_PRINT(format, ...)
+#endif
 
 namespace colorBase {
 namespace effects {
@@ -135,7 +144,7 @@ void colorBaseMgr::colorLoopCallback<colorType::HSV>(void *arg)
         (mgr->hsv.color.val.h >= 360 ? 0 : mgr->hsv.color.val.h + 1) : (mgr->hsv.color.val.h <= 0 ? 360 : mgr->hsv.color.val.h - 1) 
     );
     
-    mgr->setColor(mgr->hsv.color);
+    mgr->setColorInternal(mgr->hsv.color);
     mgr->portMgr.timer.execute();
 }
 
@@ -143,11 +152,12 @@ template <>
 void colorBaseMgr::startColorLoop<colorType::HSV>(uint16_t loopMs)
 {
     using colorLoopCallbackType = void (*)(void *);
+    this->onoff = true;
+    portMgr.timer.stopExecute();
     this->colorMode = colorType::RGB;
     this->effectMode = colorEffectMode::COLORLOOP;
     this->hsv.effectVal.loopDirection = 1;
     this->hsv.effectVal.loopMs = loopMs;
-    portMgr.timer.stopExecute();
     portMgr.timer.setType(0);
     portMgr.timer.setExecuteTime((this->hsv.effectVal.loopMs / 360) > 0 ? (this->hsv.effectVal.loopMs / 360) : 1);
     portMgr.timer.setObj((void *)this);
@@ -156,5 +166,191 @@ void colorBaseMgr::startColorLoop<colorType::HSV>(uint16_t loopMs)
     portMgr.timer.execute();
 }
 
+
+
+
+
+template <>
+void colorBaseMgr::colorLinearCallback<colorType::RGB>(void *arg)
+{
+    colorBaseMgr *mgr = (colorBaseMgr *)arg;
+
+    mgr->rgb.color.val.r += (mgr->rgb.effectVal.target.val.r - mgr->rgb.color.val.r) / mgr->rgb.effectVal.linearStep;
+    mgr->rgb.color.val.g += (mgr->rgb.effectVal.target.val.g - mgr->rgb.color.val.g) / mgr->rgb.effectVal.linearStep;
+    mgr->rgb.color.val.b += (mgr->rgb.effectVal.target.val.b - mgr->rgb.color.val.b) / mgr->rgb.effectVal.linearStep;
+    
+    mgr->setColorInternal(mgr->rgb.color);
+    if(!mgr->rgb.color.val.r & !mgr->rgb.color.val.g & !mgr->rgb.color.val.b)
+        mgr->onoff = false;
+    if(--mgr->rgb.effectVal.linearStep)
+        mgr->portMgr.timer.execute();
+    
+}
+
+void colorBaseMgr::startColorLinear(Color<colorType::RGB> &tar)
+{
+    using linearCallbackType = void (*)(void *);
+    this->onoff = true;
+    this->portMgr.timer.stopExecute();
+    this->colorMode = colorType::RGB;
+    this->effectMode = colorEffectMode::LINEAR;
+    this->rgb.effectVal.target = tar;
+    CB_PRINT("target: %d %d %d", this->rgb.effectVal.target.val.r, this->rgb.effectVal.target.val.g, this->rgb.effectVal.target.val.b);
+    CB_PRINT("current: %d %d %d", this->rgb.color.val.r, this->rgb.color.val.g, this->rgb.color.val.b);
+    this->rgb.effectVal.linearStep = this->rgb.effectVal.linearMs / this->rgb.effectVal.linearIntervalMs;
+    CB_PRINT("linearStep: %d", this->rgb.effectVal.linearStep);
+    this->portMgr.timer.setType(0);
+    this->portMgr.timer.setExecuteTime(this->rgb.effectVal.linearIntervalMs);
+    this->portMgr.timer.setObj((void *)this);
+    this->portMgr.timer.setCallback(reinterpret_cast<linearCallbackType>(colorBaseMgr::colorLinearCallback<colorType::RGB>));
+
+    this->portMgr.timer.execute(); 
+
+}
+
+void colorBaseMgr::startColorLinear(Color<colorType::HSV> &tar)
+{
+    this->colorMode = colorType::HSV;
+    this->effectMode = colorEffectMode::LINEAR;
+}
+
+void colorBaseMgr::startColorLinear(Color<colorType::CCTB> &tar)
+{
+    this->colorMode = colorType::CCTB;
+    this->effectMode = colorEffectMode::LINEAR;
+}
+
+void colorBaseMgr::startColorLinear(Color<colorType::CW> &tar)
+{
+    this->colorMode = colorType::CW;
+    this->effectMode = colorEffectMode::LINEAR;
+}
+
+void colorBaseMgr::setOnoff(bool onoff)
+{
+    if(this->onoff ^ onoff ^ 1)
+        return;
+    
+    switch(this->colorMode){
+        case colorType::RGB:
+        {
+            Color<colorType::RGB> color;
+            if(!onoff)
+                this->rgb.prevColor = this->rgb.color;
+            else {
+                color = this->rgb.prevColor;
+            }
+            this->onoff ^= 1;
+            setColor(color);
+        }
+        break;
+
+        case colorType::HSV:
+        {
+            Color<colorType::HSV> color;
+            if(!onoff)
+                this->hsv.prevColor = this->hsv.color;
+            else {
+                color = this->hsv.prevColor;
+            }
+            this->onoff ^= 1;
+            setColor(color);
+        }
+        break;
+
+        case colorType::CCTB:
+        {
+            Color<colorType::CCTB> color;
+            if(!onoff)
+                this->cctb.prevColor = this->cctb.color;
+            else {
+                color = this->cctb.prevColor;
+            }
+            this->onoff ^= 1;
+            setColor(color);
+        }
+        break;
+
+        case colorType::CW:
+        {
+            Color<colorType::CW> color;
+            if(!onoff)
+                this->cw.prevColor = this->cw.color;
+            else {
+                color = this->cw.prevColor;
+            }
+            this->onoff ^= 1;
+            setColor(color);
+        }
+        break;
+
+        default:
+        break;
+    }
+
+}
+
+void colorBaseMgr::setOnoffLinear(bool onoff)
+{
+    if(this->onoff ^ onoff ^ 1)
+        return;
+    
+    switch(this->colorMode){
+        case colorType::RGB:
+        {
+            Color<colorType::RGB> color;
+            if(!onoff)
+                this->rgb.prevColor = this->rgb.color;
+            else {
+                color = this->rgb.prevColor;
+            }
+            this->onoff ^= 1;
+            this->startColorLinear(color);
+        }
+        break;
+
+        case colorType::HSV:
+        {
+            Color<colorType::HSV> color;
+            if(!onoff)
+                this->hsv.prevColor = this->hsv.color;
+            else {
+                color = this->hsv.prevColor;
+            }
+            this->onoff ^= 1;
+            this->startColorLinear(color);
+        }
+        break;
+
+        case colorType::CCTB:
+        {
+            Color<colorType::CCTB> color;
+            if(!onoff)
+                this->cctb.prevColor = this->cctb.color;
+            else {
+                color = this->cctb.prevColor;
+            }
+            this->onoff ^= 1;
+            this->startColorLinear(color);
+        }
+        break;
+
+        case colorType::CW:
+        {
+            Color<colorType::CW> color;
+            if(!onoff)
+                this->cw.prevColor = this->cw.color;
+            else {
+                color = this->cw.prevColor;
+            }
+            this->onoff ^= 1;
+            this->startColorLinear(color);
+        }
+        break;
+
+        default:
+        break;
+    }
+}
 } /* colorBase */
 
