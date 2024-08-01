@@ -2,7 +2,8 @@
 
 #include <stdint.h>
 #include <functional>
-#define COLORBASE_DEBUG_PRINT 1
+#include <colorBase/colorBasePort.h>
+
 namespace colorBase {
 
 /**
@@ -121,7 +122,7 @@ using hookCallback = std::function<void(Color<T>&)>;
 template <colorType T>
 struct colorMgr {
     Color<T> color;
-    /* implement your actual light device's color setting callback */
+    /* implement your actual light device's color setting callback in colorBasePort.cpp */
     hookCallback<T> cbImpl;
     colorEffectVal<T> effectVal;
 
@@ -138,54 +139,53 @@ void convert(const Color<colorType::CW> &src, Color<colorType::CCTB> &tar);
 } /* effects */
 
 
-#include <TimerEvents/TimerEvents.h>
+
+
+
+
 class colorBaseMgr {
 
 public:
-    colorBaseMgr(): colorMode(colorType::RGB) {}
-    colorBaseMgr(colorType mode): colorMode(mode) {}
+    colorBaseMgr(): colorMode(colorType::RGB) {
+        portMgr.initImpl(*this);
+    }
+    colorBaseMgr(colorType mode): colorMode(mode) {
+        portMgr.initImpl(*this);
+    }
 
     
     
     void setColor(Color<colorType::RGB> &src)
     {
         this->colorMode = colorType::RGB;
+        this->effectMode = colorEffectMode::NORMAL;
         this->rgb.color = src;
-#if COLORBASE_DEBUG_PRINT
-        printf("set color: %d %d %d\n", this->rgb.color.val.r, this->rgb.color.val.g, this->rgb.color.val.b);
-#endif
-        if(this->rgb.cbImpl)
-            this->rgb.cbImpl(src);
+
+        this->rgb.cbImpl(src);
     }
     void setColor(Color<colorType::HSV> &src)
     {
         this->colorMode = colorType::HSV;
+        this->effectMode = colorEffectMode::NORMAL;
         this->hsv.color = src;
-#if COLORBASE_DEBUG_PRINT
-        printf("set color: %d %d %d\n", this->hsv.color.val.h, this->hsv.color.val.s, this->hsv.color.val.v);
-#endif
-        if(this->hsv.cbImpl)
-            this->hsv.cbImpl(src);
+
+        this->hsv.cbImpl(src);
     }
     void setColor(Color<colorType::CCTB> &src)
     {
         this->colorMode = colorType::CCTB;
+        this->effectMode = colorEffectMode::NORMAL;
         this->cctb.color = src;
-#if COLORBASE_DEBUG_PRINT
-        printf("set color: %d %d %d\n", this->cctb.color.val.cct, this->cctb.color.val.b);
-#endif
-        if(this->cctb.cbImpl)
-            this->cctb.cbImpl(src);
+
+        this->cctb.cbImpl(src);
     }
     void setColor(Color<colorType::CW> &src)
     {
         this->colorMode = colorType::CW;
+        this->effectMode = colorEffectMode::NORMAL;
         this->cw.color = src;
-#if COLORBASE_DEBUG_PRINT
-        printf("set color: %d %d %d\n", this->cw.color.val.c, this->cw.color.val.w);
-#endif
-        if(this->cw.cbImpl)
-            this->cw.cbImpl(src);
+
+        this->cw.cbImpl(src);
     }
 
     void setColorCallback(hookCallback<colorType::RGB> cb)
@@ -219,10 +219,12 @@ private:
     colorMgr<colorType::CCTB> cctb;
     colorMgr<colorType::CW> cw;
     
-    TimerEvents::TimerEvents timer;
+    colorBasePortMgr portMgr;
 
 
 }; /* class colorBaseMgr */
+
+
 
 
 
