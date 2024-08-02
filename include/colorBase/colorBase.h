@@ -119,7 +119,7 @@ struct colorEffectVal {
 
 
 template <colorType T>
-using hookCallback = std::function<void(Color<T>&)>;
+using hookCallback = std::function<void(const Color<T>&)>;
 
 template <colorType T>
 struct colorMgr {
@@ -156,42 +156,7 @@ public:
         portMgr.initImpl(*this);
     }
 
-    inline void setColor(Color<colorType::RGB> &src)
-    {
-        this->portMgr.timer.stopExecute();
-        this->colorMode = colorType::RGB;
-        this->effectMode = colorEffectMode::NORMAL;
-        this->rgb.color = src;
-
-        this->rgb.cbImpl(src);
-    }
-    inline void setColor(Color<colorType::HSV> &src)
-    {
-        this->portMgr.timer.stopExecute();
-        this->colorMode = colorType::HSV;
-        this->effectMode = colorEffectMode::NORMAL;
-        this->hsv.color = src;
-
-        this->hsv.cbImpl(src);
-    }
-    inline void setColor(Color<colorType::CCTB> &src)
-    {
-        this->portMgr.timer.stopExecute();
-        this->colorMode = colorType::CCTB;
-        this->effectMode = colorEffectMode::NORMAL;
-        this->cctb.color = src;
-
-        this->cctb.cbImpl(src);
-    }
-    inline void setColor(Color<colorType::CW> &src)
-    {
-        this->portMgr.timer.stopExecute();
-        this->colorMode = colorType::CW;
-        this->effectMode = colorEffectMode::NORMAL;
-        this->cw.color = src;
-
-        this->cw.cbImpl(src);
-    }
+    
 
     inline void setColorInternal(Color<colorType::RGB> &src)
     {
@@ -216,21 +181,18 @@ public:
 
 
     void setOnoff(bool onoff);
-    
-    
     void setOnoffLinear(bool onoff);
-    
 
-    
+    void setColor(const Color<colorType::RGB> &tar);
+    void setColor(const Color<colorType::HSV> &tar);
+    void setColor(const Color<colorType::CCTB> &tar);
+    void setColor(const Color<colorType::CW> &tar);
+
     /* color linear */
-    void setColorLinear(Color<colorType::RGB> &src);
-    void setColorLinear(Color<colorType::HSV> &src);
-    void setColorLinear(Color<colorType::CCTB> &src);
-    void setColorLinear(Color<colorType::CW> &src);
-    void startColorLinear(Color<colorType::RGB> &tar);
-    void startColorLinear(Color<colorType::HSV> &tar);
-    void startColorLinear(Color<colorType::CCTB> &tar);
-    void startColorLinear(Color<colorType::CW> &tar);
+    void startColorLinear(const Color<colorType::RGB> &tar);
+    void startColorLinear(const Color<colorType::HSV> &tar);
+    void startColorLinear(const Color<colorType::CCTB> &tar);
+    void startColorLinear(const Color<colorType::CW> &tar);
 
     template <colorType>
     static void colorLinearCallback(void *arg);
@@ -243,7 +205,10 @@ public:
     void startColorLoop(uint16_t loopMs);
     
     
-    
+    std::map<int, int> *getGammaMap()
+    {
+        return &this->gammaTable;
+    };
 
    
 private:
@@ -258,6 +223,8 @@ private:
     
     /* colorBasePort.cpp */
     colorBasePortMgr portMgr;
+    std::map<int, int> gammaTable;
+    
     /* internal setcolor callback impl for port */
     inline void setColorCallback(hookCallback<colorType::RGB> cb)
     {

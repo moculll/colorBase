@@ -46,27 +46,63 @@ int main(int argc, char *argv[])
         using namespace std;
         using namespace colorBase;
         Color<colorType::RGB> rgb(123, 234, 122);
-        Color<colorType::HSV> hsv;
-        Color<colorType::CW> cw;
-        Color<colorType::CCTB> cctb;
+        Color<colorType::HSV> hsv(120, 100, 100);
+        Color<colorType::CW> cw(255, 123);
+        Color<colorType::CCTB> cctb(100, 100);
 /*         rgb_unit_test();
         cw_unit_test(); */
         testcl testclass;
-/*         testclass.color.startColorLoop<colorType::HSV>(3600); */
-        testclass.color.startColorLinear(rgb);
-        Sleep(100);
-        testclass.color.setOnoffLinear(true);
-        Sleep(100);
-        testclass.color.setOnoffLinear(true);
+        testclass.color.startColorLoop<colorType::HSV>(3600);
+        testclass.color.startColorLinear(cw);
 
+        cw = {0, 0};
+
+        testclass.color.setOnoff(false);
+        Sleep(1000);
+        cw = {30, 50};
+
+        testclass.color.startColorLinear(cw);
+
+        Sleep(2000);
+ 
+        testclass.color.setOnoff(false);
+        Sleep(1000);
+        cw = {55, 22};
+
+        testclass.color.setOnoff(true);
+        Sleep(3000);
+        testclass.color.startColorLinear(cw);
         Sleep(1000);
         testclass.color.setOnoffLinear(false);
-        Sleep(1000);
+        Sleep(2000);
         testclass.color.setOnoffLinear(true);
-        /* TimerEvents::TimerEvents timer(true, 1000, test, nullptr); // Fire every 1000ms (1 second)
-        timer.Execute(); */
-        
-        Sleep(1000000);
+
+        testclass.color.startColorLinear(rgb);
+        Sleep(3000);
+        rgb = {0, 0, 0};
+
+        testclass.color.setOnoff(false);
+        Sleep(1000);
+        rgb = {30, 50, 213};
+        testclass.color.startColorLoop<colorType::HSV>(3600);
+
+        testclass.color.startColorLinear(rgb);
+
+        Sleep(2000);
+
+        testclass.color.setOnoff(false);
+        Sleep(1000);
+        rgb = {55, 22, 123};
+
+        testclass.color.setOnoff(true);
+        Sleep(3000);
+        testclass.color.startColorLinear(rgb);
+        Sleep(1000);
+        testclass.color.setOnoffLinear(false);
+        Sleep(2000);
+        testclass.color.setOnoffLinear(true);
+        testclass.color.startColorLoop<colorType::HSV>(3600);
+        Sleep(3000);
     }
 
 }

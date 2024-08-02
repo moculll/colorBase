@@ -44,6 +44,11 @@ public:
         return true;
     }
 
+    bool getRunningStatus()
+    {
+        return runningStatus;
+    }
+
     bool stopExecute() {
         runningStatus = false;
         if (timerID) {
