@@ -184,10 +184,11 @@ public:
     void setOnoff(bool onoff);
     void setOnoffLinear(bool onoff);
 
-    void setColor(const Color<colorType::RGB> &tar);
-    void setColor(const Color<colorType::HSV> &tar);
-    void setColor(const Color<colorType::CCTB> &tar);
-    void setColor(const Color<colorType::CW> &tar);
+    template <colorType T>
+    void setColor(const Color<T> &tar);
+
+    template <colorType T>
+    inline Color<T> &getColor();
 
     /* color linear */
     void startColorLinear(const Color<colorType::RGB> &tar);

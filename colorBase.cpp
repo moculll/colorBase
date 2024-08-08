@@ -166,6 +166,7 @@ void colorBaseMgr::startColorLoop<colorType::HSV>(uint16_t loopMs)
     portMgr.timer.execute();
 }
 
+template <>
 void colorBaseMgr::setColor(const Color<colorType::RGB> &tar)
 {
     bool prevOnoff = this->onoff;
@@ -182,6 +183,7 @@ void colorBaseMgr::setColor(const Color<colorType::RGB> &tar)
     this->rgb.cbImpl(tar);
 }
 
+template <>
 void colorBaseMgr::setColor(const Color<colorType::HSV> &tar)
 {
     bool prevOnoff = this->onoff;
@@ -199,6 +201,7 @@ void colorBaseMgr::setColor(const Color<colorType::HSV> &tar)
     this->hsv.cbImpl(tar);
 }
 
+template <>
 void colorBaseMgr::setColor(const Color<colorType::CCTB> &tar)
 {
     bool prevOnoff = this->onoff;
@@ -216,6 +219,7 @@ void colorBaseMgr::setColor(const Color<colorType::CCTB> &tar)
     this->cctb.cbImpl(tar);
 }
 
+template <>
 void colorBaseMgr::setColor(const Color<colorType::CW> &tar)
 {
     bool prevOnoff = this->onoff;
@@ -462,5 +466,31 @@ void colorBaseMgr::setOnoffLinear(bool onoff)
         break;
     }
 }
+
+
+template<>
+Color<colorType::RGB> &colorBaseMgr::getColor()
+{
+    return this->rgb.color;
+}
+
+template<>
+Color<colorType::HSV> &colorBaseMgr::getColor()
+{
+    return this->hsv.color;
+}
+
+template<>
+Color<colorType::CCTB> &colorBaseMgr::getColor()
+{
+    return this->cctb.color;
+}
+
+template<>
+Color<colorType::CW> &colorBaseMgr::getColor()
+{
+    return this->cw.color;
+}
+
 } /* colorBase */
 

@@ -65,6 +65,8 @@ int main(int argc, char *argv[])
         testclass.color.startColorLoop<colorType::HSV>(3600);
         testclass.color.startColorLinear(cw);
 
+        rgb = testclass.color.getColor<colorType::RGB>();
+        
         cw = {0, 0};
 
         testclass.color.setOnoff(false);
