@@ -5,11 +5,12 @@
 #ifdef __linux__
 
 #include <unistd.h>
+#define TEST_SLEEP(ms) sleep(ms / 1000 ? ms / 1000 : 1)
 
 #else
 
 #include <windows.h>
-
+#define TEST_SLEEP(ms) Sleep(ms)
 #endif
 void rgb_unit_test()
 {
@@ -67,51 +68,51 @@ int main(int argc, char *argv[])
         cw = {0, 0};
 
         testclass.color.setOnoff(false);
-        Sleep(1000);
+        TEST_SLEEP(1000);
         cw = {30, 50};
 
         testclass.color.startColorLinear(cw);
 
-        Sleep(2000);
+        TEST_SLEEP(2000);
  
         testclass.color.setOnoff(false);
-        Sleep(1000);
+        TEST_SLEEP(1000);
         cw = {55, 22};
 
         testclass.color.setOnoff(true);
-        Sleep(3000);
+        TEST_SLEEP(3000);
         testclass.color.startColorLinear(cw);
-        Sleep(1000);
+        TEST_SLEEP(1000);
         testclass.color.setOnoffLinear(false);
-        Sleep(2000);
+        TEST_SLEEP(2000);
         testclass.color.setOnoffLinear(true);
 
         testclass.color.startColorLinear(rgb);
-        Sleep(3000);
+        TEST_SLEEP(3000);
         rgb = {0, 0, 0};
 
         testclass.color.setOnoff(false);
-        Sleep(1000);
+        TEST_SLEEP(1000);
         rgb = {30, 50, 213};
         testclass.color.startColorLoop<colorType::HSV>(3600);
 
         testclass.color.startColorLinear(rgb);
 
-        Sleep(2000);
+        TEST_SLEEP(2000);
 
         testclass.color.setOnoff(false);
-        Sleep(1000);
+        TEST_SLEEP(1000);
         rgb = {55, 22, 123};
 
         testclass.color.setOnoff(true);
-        Sleep(3000);
+        TEST_SLEEP(3000);
         testclass.color.startColorLinear(rgb);
-        Sleep(1000);
+        TEST_SLEEP(1000);
         testclass.color.setOnoffLinear(false);
-        Sleep(2000);
+        TEST_SLEEP(2000);
         testclass.color.setOnoffLinear(true);
         testclass.color.startColorLoop<colorType::HSV>(3600);
-        Sleep(3000);
+        TEST_SLEEP(3000);
     }
 
 }

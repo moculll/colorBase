@@ -158,7 +158,7 @@ void colorBaseMgr::startColorLoop<colorType::HSV>(uint16_t loopMs)
     this->effectMode = colorEffectMode::COLORLOOP;
     this->hsv.effectVal.loopDirection = 1;
     this->hsv.effectVal.loopMs = loopMs;
-    portMgr.timer.setType(0);
+    portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
     portMgr.timer.setExecuteTime((this->hsv.effectVal.loopMs / 360) > 0 ? (this->hsv.effectVal.loopMs / 360) : 1);
     portMgr.timer.setObj((void *)this);
     portMgr.timer.setCallback(reinterpret_cast<colorLoopCallbackType>(colorBaseMgr::colorLoopCallback<colorType::HSV>));
@@ -268,7 +268,7 @@ void colorBaseMgr::startColorLinear(const Color<colorType::RGB> &tar)
     CB_PRINT("current: %d %d %d", this->rgb.color.val.r, this->rgb.color.val.g, this->rgb.color.val.b);
     this->rgb.effectVal.linearStep = this->rgb.effectVal.linearMs / this->rgb.effectVal.linearIntervalMs;
     CB_PRINT("linearStep: %d", this->rgb.effectVal.linearStep);
-    this->portMgr.timer.setType(0);
+    this->portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
     this->portMgr.timer.setExecuteTime(this->rgb.effectVal.linearIntervalMs);
     this->portMgr.timer.setObj((void *)this);
     this->portMgr.timer.setCallback(reinterpret_cast<linearCallbackType>(colorBaseMgr::colorLinearCallback<colorType::RGB>));
@@ -312,7 +312,7 @@ void colorBaseMgr::startColorLinear(const Color<colorType::HSV> &tar)
     CB_PRINT("current: %d %d %d", this->hsv.color.val.h, this->hsv.color.val.s, this->hsv.color.val.v);
     this->hsv.effectVal.linearStep = this->hsv.effectVal.linearMs / this->hsv.effectVal.linearIntervalMs;
     CB_PRINT("linearStep: %d", this->hsv.effectVal.linearStep);
-    this->portMgr.timer.setType(0);
+    this->portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
     this->portMgr.timer.setExecuteTime(this->hsv.effectVal.linearIntervalMs);
     this->portMgr.timer.setObj((void *)this);
     this->portMgr.timer.setCallback(reinterpret_cast<linearCallbackType>(colorBaseMgr::colorLinearCallback<colorType::HSV>));
@@ -354,7 +354,7 @@ void colorBaseMgr::startColorLinear(const Color<colorType::CCTB> &tar)
     CB_PRINT("current: %d %d", this->cctb.color.val.cct, this->cctb.color.val.b);
     this->cctb.effectVal.linearStep = this->cctb.effectVal.linearMs / this->cctb.effectVal.linearIntervalMs;
     CB_PRINT("linearStep: %d", this->cctb.effectVal.linearStep);
-    this->portMgr.timer.setType(0);
+    this->portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
     this->portMgr.timer.setExecuteTime(this->cctb.effectVal.linearIntervalMs);
     this->portMgr.timer.setObj((void *)this);
     this->portMgr.timer.setCallback(reinterpret_cast<linearCallbackType>(colorBaseMgr::colorLinearCallback<colorType::CCTB>));
@@ -396,7 +396,7 @@ void colorBaseMgr::startColorLinear(const Color<colorType::CW> &tar)
     CB_PRINT("current: %d %d", this->cw.color.val.c, this->cw.color.val.w);
     this->cw.effectVal.linearStep = this->cw.effectVal.linearMs / this->cw.effectVal.linearIntervalMs;
     CB_PRINT("linearStep: %d", this->cw.effectVal.linearStep);
-    this->portMgr.timer.setType(0);
+    this->portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
     this->portMgr.timer.setExecuteTime(this->cw.effectVal.linearIntervalMs);
     this->portMgr.timer.setObj((void *)this);
     this->portMgr.timer.setCallback(reinterpret_cast<linearCallbackType>(colorBaseMgr::colorLinearCallback<colorType::CW>));

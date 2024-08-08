@@ -28,14 +28,21 @@ public:
 
     using timer_events_handler_t = std::function<void(void*)>;
     TimerEvents(bool loop, uint32_t _executeTime, timer_events_handler_t _handler, void* objptr)
-        : executeTime(_executeTime), handler(_handler), objectPtr(objptr), runningStatus(false), timerID(0) {
+        : executeTime(_executeTime), handler(_handler), objectPtr(objptr), runningStatus(false), timerID(nullptr) {
         if (loop) {
             timerType = TIMER_TYPE_PERIODIC;
         } else {
             timerType = TIMER_TYPE_ONESHOT;
         }
     }
-    TimerEvents() {}
+    TimerEvents() {
+        executeTime = 0;
+        handler = nullptr;
+        objectPtr = nullptr;
+        timerID = nullptr;
+        runningStatus = false;
+        timerType = TIMER_TYPE_ONESHOT;
+    }
     ~TimerEvents() {
         stopExecute();
     }
@@ -65,14 +72,15 @@ public:
     uint32_t getRemainingTime() {
         return 0;
     }
-
+    bool getRunningStatus(){
+        return runningStatus;
+    }
 #ifdef __linux__
     bool stopExecute() {
         runningStatus = false;
         if (timerID) {
             struct itimerspec value = {0};
             timer_settime (timerID, 0, &value, NULL);
-            timerID = nullptr;
         }
         return true;
     }
@@ -81,7 +89,8 @@ public:
         struct sigevent te;
         struct itimerspec value = {0};
         struct sigaction sigAction;
-        timer_settime (timerID, 0, &value, NULL);
+        if(timerID)
+            timer_settime (timerID, 0, &value, NULL);
 
         te.sigev_notify = SIGEV_THREAD;
         te.sigev_notify_function = &TimerEvents::StaticTimerCallback;
@@ -91,13 +100,13 @@ public:
 
         if(type == TIMER_TYPE_PERIODIC){
             value.it_value.tv_sec = 0;
-            value.it_value.tv_nsec = intervalMs * 1000;
+            value.it_value.tv_nsec = intervalMs * 1000000;
             value.it_interval.tv_sec = 0;
-            value.it_interval.tv_nsec = intervalMs * 1000;
+            value.it_interval.tv_nsec = intervalMs * 1000000;
         }
         else if(type == TIMER_TYPE_ONESHOT){
             value.it_value.tv_sec = 0;
-            value.it_value.tv_nsec = intervalMs * 1000;
+            value.it_value.tv_nsec = intervalMs * 1000000;
             value.it_interval.tv_sec = 0;
             value.it_interval.tv_nsec = 0;
         }

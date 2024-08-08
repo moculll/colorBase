@@ -14,4 +14,4 @@ else()
     message(FATAL_ERROR "Unsupported platform")
 endif()
 
-add_executable(colorBase ${CMAKE_SOURCE_DIR}/colorBase.cpp ${CMAKE_SOURCE_DIR}/example/main.cpp)
+add_executable(colorBase ${CMAKE_SOURCE_DIR}/colorBase.cpp ${CMAKE_SOURCE_DIR}/colorBasePort.cpp ${CMAKE_SOURCE_DIR}/example/main.cpp)
