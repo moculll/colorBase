@@ -1,7 +1,16 @@
 #include <colorBase/colorBase.h>
 #include <stdio.h>
 #include <TimerEvents/TimerEvents.h>
+
+#ifdef __linux__
+
+#include <unistd.h>
+
+#else
+
 #include <windows.h>
+
+#endif
 void rgb_unit_test()
 {
     using namespace std;

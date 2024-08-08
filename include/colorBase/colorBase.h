@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdio.h>
 #include <functional>
 #define COLORBASE_DEBUG_PRINT 1
 namespace colorBase {
