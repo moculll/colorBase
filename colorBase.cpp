@@ -469,27 +469,27 @@ void colorBaseMgr::setOnoffLinear(bool onoff)
 
 
 template<>
-Color<colorType::RGB> &colorBaseMgr::getColor()
+void colorBaseMgr::getColor(Color<colorType::RGB> &dst)
 {
-    return this->rgb.color;
+    dst = this->rgb.color;
 }
 
 template<>
-Color<colorType::HSV> &colorBaseMgr::getColor()
+void colorBaseMgr::getColor(Color<colorType::HSV> &dst)
 {
-    return this->hsv.color;
+    dst = this->hsv.color;
 }
 
 template<>
-Color<colorType::CCTB> &colorBaseMgr::getColor()
+void colorBaseMgr::getColor(Color<colorType::CCTB> &dst)
 {
-    return this->cctb.color;
+    dst = this->cctb.color;
 }
 
 template<>
-Color<colorType::CW> &colorBaseMgr::getColor()
+void colorBaseMgr::getColor(Color<colorType::CW> &dst)
 {
-    return this->cw.color;
+    dst = this->cw.color;
 }
 
 } /* colorBase */

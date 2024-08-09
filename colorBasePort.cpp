@@ -85,4 +85,4 @@ void colorBasePortMgr::initImpl(colorBaseMgr &mgr)
 }
 
 
-}
+} /* colorBase */
