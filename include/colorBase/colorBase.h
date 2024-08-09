@@ -22,7 +22,7 @@ enum class colorType {
 
 template <colorType T>
 struct ColorBaseType {
-    ColorBaseType<T>& operator=(const ColorBaseType<T> &src) {
+    ColorBaseType<T> &operator=(const ColorBaseType<T> &src) {
         if(this != &src) {
             assign(src);
         }
@@ -124,7 +124,7 @@ protected:
         const Color<colorType::CW>* pSrc = static_cast<const Color<colorType::CW>*>(&src);
         val = pSrc->val;
     }
-};/* struct Color */
+}; /* struct Color */
 
 
 enum class colorEffectMode {
@@ -242,7 +242,7 @@ public:
     void startColorLoop(uint16_t loopMs);
     
     
-    std::map<int, int> *getGammaMap()
+    inline std::map<int, int> *getGammaMap()
     {
         return &this->gammaTable;
     };

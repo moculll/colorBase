@@ -413,27 +413,19 @@ void colorBaseMgr::setOnoff(bool onoff)
   
     switch(this->colorMode){
         case colorType::RGB:
-        {
             setColor(onoff ? (this->rgb.prevColor) : (Color<colorBase::colorType::RGB>(0, 0, 0)));
-        }
         break;
 
         case colorType::HSV:
-        {
             setColor(onoff ? (this->hsv.prevColor) : (Color<colorBase::colorType::HSV>(0, 0, 0)));
-        }
         break;
 
         case colorType::CCTB:
-        {
             setColor(onoff ? (this->cctb.prevColor) : (Color<colorBase::colorType::CCTB>(0, 0)));
-        }
         break;
 
         case colorType::CW:
-        {
             setColor(onoff ? (this->cw.prevColor) : (Color<colorBase::colorType::CW>(0, 0)));
-        }
         break;
 
         default:

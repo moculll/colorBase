@@ -73,7 +73,7 @@ void colorBasePortMgr::initImpl(colorBaseMgr &mgr)
     mgr.setColorCallback(colorCallbackImpl<colorType::CCTB>);
     mgr.setColorCallback(colorCallbackImpl<colorType::CW>);
     colorBasePort::gammaTable = mgr.getGammaMap();
-    makeGammaTable(*colorBasePort::gammaTable, 256, 1.0, 10);
+    makeGammaTable(*colorBasePort::gammaTable, 256, 1.0, 8);
     (*colorBasePort::gammaTable)[255] -= 1;
 
 #if COLORBASEPORT_PRINT
