@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdio.h>
 #include <functional>
 #include <colorBase/colorBasePort.h>
 
@@ -19,12 +20,23 @@ enum class colorType {
     CCTB
 }; /* enum class colorType */
 
+template <colorType T>
+struct ColorBaseType {
+    ColorBaseType<T> &operator=(const ColorBaseType<T> &src) {
+        if(this != &src) {
+            assign(src);
+        }
+        return *this;
+    }
+protected:
+    virtual void assign(const ColorBaseType<T>& src) = 0;
+}; /* struct ColorBaseType */
 
 template <colorType>
 struct Color;
 
 template <>
-struct Color<colorType::RGB> {
+struct Color<colorType::RGB> : public ColorBaseType<colorType::RGB> {
     struct _RGB {
         /* 0-255 */
         uint8_t r;
@@ -38,11 +50,17 @@ struct Color<colorType::RGB> {
 
     Color(uint8_t r, uint8_t g, uint8_t b) : val{r, g, b} {}
     Color() : val{0, 0, 0} {}
-
+    
+protected:
+    void assign(const ColorBaseType<colorType::RGB>& src) override
+    {
+        const Color<colorType::RGB>* pSrc = static_cast<const Color<colorType::RGB>*>(&src);
+        val = pSrc->val;
+    }
 };
 
 template <>
-struct Color<colorType::HSV> {
+struct Color<colorType::HSV> : public ColorBaseType<colorType::HSV> {
     struct _HSV {
         /* 0-359 */
         uint16_t h;
@@ -56,27 +74,16 @@ struct Color<colorType::HSV> {
 
     Color(uint16_t h, uint8_t s, uint8_t v) : val{h, s, v} {}
     Color() : val{0, 0, 0} {}
-
+protected:
+    void assign(const ColorBaseType<colorType::HSV>& src) override
+    {
+        const Color<colorType::HSV>* pSrc = static_cast<const Color<colorType::HSV>*>(&src);
+        val = pSrc->val;
+    }
 };
 
 template <>
-struct Color<colorType::CW> {
-    struct _CW {
-        /* 0-255 */
-        uint16_t c;
-        /* 0-255 */
-        uint16_t w;
-    } __attribute__((aligned(sizeof(void *))));
-
-    _CW val;
-
-    Color(uint16_t c, uint16_t w) : val{c, w} {}
-    Color() : val{0, 0} {}
-
-};
-
-template <>
-struct Color<colorType::CCTB> {
+struct Color<colorType::CCTB> : public ColorBaseType<colorType::CCTB> {
     struct _CCTB {
         /* 0-100 */
         uint16_t cct;
@@ -89,8 +96,35 @@ struct Color<colorType::CCTB> {
     Color(uint16_t cct, uint16_t b) : val{cct, b} {}
     Color() : val{0, 0} {}
 
-}; /* struct Color */
+protected:
+    void assign(const ColorBaseType<colorType::CCTB>& src) override
+    {
+        const Color<colorType::CCTB>* pSrc = static_cast<const Color<colorType::CCTB>*>(&src);
+        val = pSrc->val;
+    }
+}; 
 
+template <>
+struct Color<colorType::CW> : public ColorBaseType<colorType::CW> {
+    struct _CW {
+        /* 0-255 */
+        uint16_t c;
+        /* 0-255 */
+        uint16_t w;
+    } __attribute__((aligned(sizeof(void *))));
+
+    _CW val;
+
+    Color(uint16_t c, uint16_t w) : val{c, w} {}
+    Color() : val{0, 0} {}
+
+protected:
+    void assign(const ColorBaseType<colorType::CW>& src) override
+    {
+        const Color<colorType::CW>* pSrc = static_cast<const Color<colorType::CW>*>(&src);
+        val = pSrc->val;
+    }
+}; /* struct Color */
 
 
 enum class colorEffectMode {
@@ -183,10 +217,13 @@ public:
     void setOnoff(bool onoff);
     void setOnoffLinear(bool onoff);
 
-    void setColor(const Color<colorType::RGB> &tar);
-    void setColor(const Color<colorType::HSV> &tar);
-    void setColor(const Color<colorType::CCTB> &tar);
-    void setColor(const Color<colorType::CW> &tar);
+    template <colorType T>
+    void setColor(const Color<T> &tar);
+
+    template <colorType T>
+    void getColor(Color<T> &dst);
+
+    
 
     /* color linear */
     void startColorLinear(const Color<colorType::RGB> &tar);
@@ -205,7 +242,7 @@ public:
     void startColorLoop(uint16_t loopMs);
     
     
-    std::map<int, int> *getGammaMap()
+    inline std::map<int, int> *getGammaMap()
     {
         return &this->gammaTable;
     };
