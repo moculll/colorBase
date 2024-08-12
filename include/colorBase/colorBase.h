@@ -183,16 +183,13 @@ void convert(const Color<colorType::CW> &src, Color<colorType::CCTB> &tar);
 class colorBaseMgr {
     friend class colorBasePortMgr;
 public:
-    colorBaseMgr(): colorMode(colorType::RGB) {
-        
-    }
-    colorBaseMgr(colorType mode): colorMode(mode) {
-        portMgr.initImpl(*this);
-    }
+    colorBaseMgr(): colorMode(colorType::RGB) {}
+    colorBaseMgr(colorType mode): colorMode(mode) {}
 
     void init()
     {
         portMgr.initImpl(*this);
+        this->portMgr.timer.setObj((void *)this);
     }
 
     inline void setColorInternal(Color<colorType::RGB> &src)
