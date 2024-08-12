@@ -149,7 +149,7 @@ void colorBaseMgr::colorLoopCallback<colorType::HSV>(void *arg)
 }
 
 template <>
-void colorBaseMgr::startColorLoop<colorType::HSV>(uint16_t loopMs)
+void colorBaseMgr::setColorLoop<colorType::HSV>(uint16_t loopMs)
 {
     using colorLoopCallbackType = void (*)(void *);
 
@@ -158,9 +158,9 @@ void colorBaseMgr::startColorLoop<colorType::HSV>(uint16_t loopMs)
     this->effectMode = colorEffectMode::COLORLOOP;
     this->hsv.effectVal.loopDirection = 1;
     this->hsv.effectVal.loopMs = loopMs;
-    portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
+
     portMgr.timer.setExecuteTime((this->hsv.effectVal.loopMs / 360) > 0 ? (this->hsv.effectVal.loopMs / 360) : 1);
-    portMgr.timer.setObj((void *)this);
+
     portMgr.timer.setCallback(reinterpret_cast<colorLoopCallbackType>(colorBaseMgr::colorLoopCallback<colorType::HSV>));
 
     portMgr.timer.execute();
@@ -241,19 +241,21 @@ template <>
 void colorBaseMgr::colorLinearCallback<colorType::RGB>(void *arg)
 {
     colorBaseMgr *mgr = (colorBaseMgr *)arg;
+    if(!mgr->rgb.effectVal.linearStep)
+        return;
 
     mgr->rgb.color.val.r += (mgr->rgb.effectVal.target.val.r - mgr->rgb.color.val.r) / mgr->rgb.effectVal.linearStep;
     mgr->rgb.color.val.g += (mgr->rgb.effectVal.target.val.g - mgr->rgb.color.val.g) / mgr->rgb.effectVal.linearStep;
     mgr->rgb.color.val.b += (mgr->rgb.effectVal.target.val.b - mgr->rgb.color.val.b) / mgr->rgb.effectVal.linearStep;
     
     mgr->setColorInternal(mgr->rgb.color);
-
+    
     if(--mgr->rgb.effectVal.linearStep && mgr->portMgr.timer.getRunningStatus())
         mgr->portMgr.timer.execute();
     
 }
 
-void colorBaseMgr::startColorLinear(const Color<colorType::RGB> &tar)
+void colorBaseMgr::setColorLinear(const Color<colorType::RGB> &tar)
 {
     using linearCallbackType = void (*)(void *);
     bool prevOnoff = this->onoff;
@@ -272,7 +274,7 @@ void colorBaseMgr::startColorLinear(const Color<colorType::RGB> &tar)
     CB_PRINT("current: %d %d %d", this->rgb.color.val.r, this->rgb.color.val.g, this->rgb.color.val.b);
     this->rgb.effectVal.linearStep = this->rgb.effectVal.linearMs / this->rgb.effectVal.linearIntervalMs;
     CB_PRINT("linearStep: %d", this->rgb.effectVal.linearStep);
-    this->portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
+
     this->portMgr.timer.setExecuteTime(this->rgb.effectVal.linearIntervalMs);
     this->portMgr.timer.setObj((void *)this);
     this->portMgr.timer.setCallback(reinterpret_cast<linearCallbackType>(colorBaseMgr::colorLinearCallback<colorType::RGB>));
@@ -285,19 +287,22 @@ template <>
 void colorBaseMgr::colorLinearCallback<colorType::HSV>(void *arg)
 {
     colorBaseMgr *mgr = (colorBaseMgr *)arg;
-
+    if(!mgr->hsv.effectVal.linearStep)
+        return;
+    
     mgr->hsv.color.val.h += (mgr->hsv.effectVal.target.val.h - mgr->hsv.color.val.h) / mgr->hsv.effectVal.linearStep;
     mgr->hsv.color.val.s += (mgr->hsv.effectVal.target.val.s - mgr->hsv.color.val.s) / mgr->hsv.effectVal.linearStep;
     mgr->hsv.color.val.v += (mgr->hsv.effectVal.target.val.v - mgr->hsv.color.val.v) / mgr->hsv.effectVal.linearStep;
     
     mgr->setColorInternal(mgr->hsv.color);
 
+    CB_PRINT("linearStep: %d", mgr->hsv.effectVal.linearStep);
     if(--mgr->hsv.effectVal.linearStep && mgr->portMgr.timer.getRunningStatus())
         mgr->portMgr.timer.execute();
     
 }
 
-void colorBaseMgr::startColorLinear(const Color<colorType::HSV> &tar)
+void colorBaseMgr::setColorLinear(const Color<colorType::HSV> &tar)
 {
     using linearCallbackType = void (*)(void *);
     bool prevOnoff = this->onoff;
@@ -316,7 +321,7 @@ void colorBaseMgr::startColorLinear(const Color<colorType::HSV> &tar)
     CB_PRINT("current: %d %d %d", this->hsv.color.val.h, this->hsv.color.val.s, this->hsv.color.val.v);
     this->hsv.effectVal.linearStep = this->hsv.effectVal.linearMs / this->hsv.effectVal.linearIntervalMs;
     CB_PRINT("linearStep: %d", this->hsv.effectVal.linearStep);
-    this->portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
+
     this->portMgr.timer.setExecuteTime(this->hsv.effectVal.linearIntervalMs);
     this->portMgr.timer.setObj((void *)this);
     this->portMgr.timer.setCallback(reinterpret_cast<linearCallbackType>(colorBaseMgr::colorLinearCallback<colorType::HSV>));
@@ -328,18 +333,19 @@ template <>
 void colorBaseMgr::colorLinearCallback<colorType::CCTB>(void *arg)
 {
     colorBaseMgr *mgr = (colorBaseMgr *)arg;
-
+    if(!mgr->cctb.effectVal.linearStep)
+        return;
     mgr->cctb.color.val.cct += (mgr->cctb.effectVal.target.val.cct - mgr->cctb.color.val.cct) / mgr->cctb.effectVal.linearStep;
     mgr->cctb.color.val.b += (mgr->cctb.effectVal.target.val.b - mgr->cctb.color.val.b) / mgr->cctb.effectVal.linearStep;
 
     mgr->setColorInternal(mgr->cctb.color);
-
+    
     if(--mgr->cctb.effectVal.linearStep && mgr->portMgr.timer.getRunningStatus())
         mgr->portMgr.timer.execute();
     
 }
 
-void colorBaseMgr::startColorLinear(const Color<colorType::CCTB> &tar)
+void colorBaseMgr::setColorLinear(const Color<colorType::CCTB> &tar)
 {
     using linearCallbackType = void (*)(void *);
     bool prevOnoff = this->onoff;
@@ -358,7 +364,7 @@ void colorBaseMgr::startColorLinear(const Color<colorType::CCTB> &tar)
     CB_PRINT("current: %d %d", this->cctb.color.val.cct, this->cctb.color.val.b);
     this->cctb.effectVal.linearStep = this->cctb.effectVal.linearMs / this->cctb.effectVal.linearIntervalMs;
     CB_PRINT("linearStep: %d", this->cctb.effectVal.linearStep);
-    this->portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
+
     this->portMgr.timer.setExecuteTime(this->cctb.effectVal.linearIntervalMs);
     this->portMgr.timer.setObj((void *)this);
     this->portMgr.timer.setCallback(reinterpret_cast<linearCallbackType>(colorBaseMgr::colorLinearCallback<colorType::CCTB>));
@@ -370,18 +376,19 @@ template <>
 void colorBaseMgr::colorLinearCallback<colorType::CW>(void *arg)
 {
     colorBaseMgr *mgr = (colorBaseMgr *)arg;
-
+    if(!mgr->cw.effectVal.linearStep)
+        return;
     mgr->cw.color.val.c += (mgr->cw.effectVal.target.val.c - mgr->cw.color.val.c) / mgr->cw.effectVal.linearStep;
     mgr->cw.color.val.w += (mgr->cw.effectVal.target.val.w - mgr->cw.color.val.w) / mgr->cw.effectVal.linearStep;
 
     mgr->setColorInternal(mgr->cw.color);
-
+    
     if(--mgr->cw.effectVal.linearStep && mgr->portMgr.timer.getRunningStatus())
         mgr->portMgr.timer.execute();
     
 }
 
-void colorBaseMgr::startColorLinear(const Color<colorType::CW> &tar)
+void colorBaseMgr::setColorLinear(const Color<colorType::CW> &tar)
 {
     using linearCallbackType = void (*)(void *);
     bool prevOnoff = this->onoff;
@@ -400,7 +407,7 @@ void colorBaseMgr::startColorLinear(const Color<colorType::CW> &tar)
     CB_PRINT("current: %d %d", this->cw.color.val.c, this->cw.color.val.w);
     this->cw.effectVal.linearStep = this->cw.effectVal.linearMs / this->cw.effectVal.linearIntervalMs;
     CB_PRINT("linearStep: %d", this->cw.effectVal.linearStep);
-    this->portMgr.timer.setType(TimerEvents::TimerEvents::TIMER_TYPE_ONESHOT);
+
     this->portMgr.timer.setExecuteTime(this->cw.effectVal.linearIntervalMs);
     this->portMgr.timer.setObj((void *)this);
     this->portMgr.timer.setCallback(reinterpret_cast<linearCallbackType>(colorBaseMgr::colorLinearCallback<colorType::CW>));
@@ -410,55 +417,99 @@ void colorBaseMgr::startColorLinear(const Color<colorType::CW> &tar)
 
 void colorBaseMgr::setOnoff(bool onoff)
 {
-  
-    switch(this->colorMode){
-        case colorType::RGB:
-            setColor(onoff ? (this->rgb.prevColor) : (Color<colorBase::colorType::RGB>(0, 0, 0)));
-        break;
-
-        case colorType::HSV:
-            setColor(onoff ? (this->hsv.prevColor) : (Color<colorBase::colorType::HSV>(0, 0, 0)));
-        break;
-
-        case colorType::CCTB:
-            setColor(onoff ? (this->cctb.prevColor) : (Color<colorBase::colorType::CCTB>(0, 0)));
-        break;
-
-        case colorType::CW:
-            setColor(onoff ? (this->cw.prevColor) : (Color<colorBase::colorType::CW>(0, 0)));
-        break;
-
-        default:
-        break;
+    CB_PRINT("set onoff: %d", onoff ? 1 : 0);
+    if(this->colorMode == colorType::RGB){
+        this->setColor(onoff ? (this->rgb.prevColor) : (Color<colorBase::colorType::RGB>(0, 0, 0)));
+    }
+    else if(this->colorMode == colorType::HSV){
+        this->setColor(onoff ? (this->hsv.prevColor) : (Color<colorBase::colorType::HSV>(0, 0, 0)));
+    }
+    else if(this->colorMode == colorType::CCTB){
+        this->setColor(onoff ? (this->cctb.prevColor) : (Color<colorBase::colorType::CCTB>(0, 0)));
+    }
+    else if(this->colorMode == colorType::CW){
+        this->setColor(onoff ? (this->cw.prevColor) : (Color<colorBase::colorType::CW>(0, 0)));
     }
 
 }
 
 void colorBaseMgr::setOnoffLinear(bool onoff)
 {
-
-    switch(this->colorMode){
-        case colorType::RGB:
-            this->startColorLinear(onoff ? (this->rgb.prevColor) : (Color<colorBase::colorType::RGB>(0, 0, 0)));
-        break;
-
-        case colorType::HSV:
-            this->startColorLinear(onoff ? (this->hsv.prevColor) : (Color<colorBase::colorType::HSV>(0, 0, 0)));
-        break;
-
-        case colorType::CCTB:
-            this->startColorLinear(onoff ? (this->cctb.prevColor) : (Color<colorBase::colorType::CCTB>(0, 0)));
-        break;
-
-        case colorType::CW:
-            this->startColorLinear(onoff ? (this->cw.prevColor) : (Color<colorBase::colorType::CW>(0, 0)));
-        break;
-
-        default:
-        break;
+    CB_PRINT("set onoff linear: %d", onoff ? 1 : 0);
+    if(this->colorMode == colorType::RGB){
+        this->setColorLinear(onoff ? (this->rgb.prevColor) : (Color<colorBase::colorType::RGB>(0, 0, 0)));
     }
+    else if(this->colorMode == colorType::HSV){
+        this->setColorLinear(onoff ? (this->hsv.prevColor) : (Color<colorBase::colorType::HSV>(0, 0, 0)));
+    }
+    else if(this->colorMode == colorType::CCTB){
+        this->setColorLinear(onoff ? (this->cctb.prevColor) : (Color<colorBase::colorType::CCTB>(0, 0)));
+    }
+    else if(this->colorMode == colorType::CW){
+        this->setColorLinear(onoff ? (this->cw.prevColor) : (Color<colorBase::colorType::CW>(0, 0)));
+    }
+
 }
 
+void colorBaseMgr::setBrightness(uint8_t brightness)
+{
+    CB_PRINT("set brightness: %d", brightness);
+    if(this->colorMode == colorType::RGB){
+        Color<colorBase::colorType::RGB> tar;
+        effects::convert(this->rgb.color, this->hsv.color);
+        this->hsv.color.val.v = brightness;
+        effects::convert(this->hsv.color, tar);
+        this->setColor(tar);
+    }
+    else if(this->colorMode == colorType::HSV){
+        Color<colorBase::colorType::HSV> tar = this->hsv.color;
+        tar.val.v = brightness;
+        this->setColor(tar);
+    }
+    else if(this->colorMode == colorType::CCTB){
+        Color<colorBase::colorType::CCTB> tar = this->cctb.color;
+        tar.val.b = brightness;
+        this->setColor(tar);
+    }
+    else if(this->colorMode == colorType::CW){
+        Color<colorBase::colorType::CW> tar;
+        effects::convert(this->cw.color, this->cctb.color);
+        this->cctb.color.val.b = brightness;
+        effects::convert(this->cctb.color, tar);
+        this->setColor(tar);
+    }
+    
+}
+
+void colorBaseMgr::setBrightnessLinear(uint8_t brightness)
+{
+    CB_PRINT("set brightness linear: %d", brightness);
+    if(this->colorMode == colorType::RGB){
+        Color<colorBase::colorType::RGB> tar;
+        effects::convert(this->rgb.color, this->hsv.color);
+        this->hsv.color.val.v = brightness;
+        effects::convert(this->hsv.color, tar);
+        this->setColorLinear(tar);
+    }
+    else if(this->colorMode == colorType::HSV){
+        Color<colorBase::colorType::HSV> tar = this->hsv.color;
+        tar.val.v = brightness;
+        this->setColorLinear(tar);
+    }
+    else if(this->colorMode == colorType::CCTB){
+        Color<colorBase::colorType::CCTB> tar = this->cctb.color;
+        tar.val.b = brightness;
+        this->setColorLinear(tar);
+    }
+    else if(this->colorMode == colorType::CW){
+        Color<colorBase::colorType::CW> tar;
+        effects::convert(this->cw.color, this->cctb.color);
+        this->cctb.color.val.b = brightness;
+        effects::convert(this->cctb.color, tar);
+        this->setColorLinear(tar);
+    }
+
+}
 
 template<>
 void colorBaseMgr::getColor(Color<colorType::RGB> &dst)

@@ -184,13 +184,16 @@ class colorBaseMgr {
     friend class colorBasePortMgr;
 public:
     colorBaseMgr(): colorMode(colorType::RGB) {
-        portMgr.initImpl(*this);
+        
     }
     colorBaseMgr(colorType mode): colorMode(mode) {
         portMgr.initImpl(*this);
     }
 
-    
+    void init()
+    {
+        portMgr.initImpl(*this);
+    }
 
     inline void setColorInternal(Color<colorType::RGB> &src)
     {
@@ -223,13 +226,14 @@ public:
     template <colorType T>
     void getColor(Color<T> &dst);
 
-    
+    void setBrightness(uint8_t brightness);
+    void setBrightnessLinear(uint8_t brightness);
 
     /* color linear */
-    void startColorLinear(const Color<colorType::RGB> &tar);
-    void startColorLinear(const Color<colorType::HSV> &tar);
-    void startColorLinear(const Color<colorType::CCTB> &tar);
-    void startColorLinear(const Color<colorType::CW> &tar);
+    void setColorLinear(const Color<colorType::RGB> &tar);
+    void setColorLinear(const Color<colorType::HSV> &tar);
+    void setColorLinear(const Color<colorType::CCTB> &tar);
+    void setColorLinear(const Color<colorType::CW> &tar);
 
     template <colorType>
     static void colorLinearCallback(void *arg);
@@ -239,7 +243,7 @@ public:
     template <colorType>
     static void colorLoopCallback(void *arg);
     template <colorType>
-    void startColorLoop(uint16_t loopMs);
+    void setColorLoop(uint16_t loopMs);
     
     
     inline std::map<int, int> *getGammaMap()
