@@ -154,16 +154,89 @@ void colorBaseMgr::setColorLoop<colorType::HSV>(uint16_t loopMs)
     using colorLoopCallbackType = void (*)(void *);
 
     portMgr.timer.stopExecute();
-    this->colorMode = colorType::RGB;
+    this->colorMode = colorType::HSV;
     this->effectMode = colorEffectMode::COLORLOOP;
+    this->hsv.color.val.v = 0;
     this->hsv.effectVal.loopDirection = 1;
-    this->hsv.effectVal.loopMs = loopMs;
+    if(loopMs)
+        this->hsv.effectVal.colorLoopMs = loopMs;
 
-    portMgr.timer.setExecuteTime((this->hsv.effectVal.loopMs / 360) > 0 ? (this->hsv.effectVal.loopMs / 360) : 1);
+
+    portMgr.timer.setExecuteTime((this->hsv.effectVal.colorLoopMs / 360) > 0 ? (this->hsv.effectVal.colorLoopMs / 360) : 1);
 
     portMgr.timer.setCallback(reinterpret_cast<colorLoopCallbackType>(colorBaseMgr::colorLoopCallback<colorType::HSV>));
 
     portMgr.timer.execute();
+}
+
+template <>
+void colorBaseMgr::brightnessLoopCallback<colorType::HSV>(void *arg)
+{
+    colorBaseMgr *mgr = (colorBaseMgr *)arg;
+    if(mgr->hsv.color.val.v >= 100){
+        mgr->hsv.effectVal.loopDirection = 1;
+    }
+    else if(mgr->hsv.color.val.v <= 0){
+        mgr->hsv.effectVal.loopDirection = 0;
+    }
+    mgr->hsv.color.val.v = (mgr->hsv.effectVal.loopDirection ? mgr->hsv.color.val.v - 1 : mgr->hsv.color.val.v + 1);
+    mgr->setColorInternal(mgr->hsv.color);
+    mgr->portMgr.timer.execute();
+}
+
+template <>
+void colorBaseMgr::setBrightnessLoop<colorType::HSV>(uint16_t loopMs)
+{
+    using brightnessLoopCallbackType = void (*)(void *);
+
+    portMgr.timer.stopExecute();
+    this->colorMode = colorType::HSV;
+    this->effectMode = colorEffectMode::BRIGHTNESSLOOP;
+    this->hsv.color.val.v = 0;
+    if(loopMs)
+        this->hsv.effectVal.brightnessLoopMs = loopMs;
+
+    portMgr.timer.setExecuteTime((this->hsv.effectVal.brightnessLoopMs / 100) > 0 ? (this->hsv.effectVal.brightnessLoopMs / 100) : 1);
+
+    portMgr.timer.setCallback(reinterpret_cast<brightnessLoopCallbackType>(colorBaseMgr::brightnessLoopCallback<colorType::HSV>));
+
+    portMgr.timer.execute();
+
+}
+
+template <>
+void colorBaseMgr::brightnessLoopCallback<colorType::CCTB>(void *arg)
+{
+    colorBaseMgr *mgr = (colorBaseMgr *)arg;
+    if(mgr->cctb.color.val.b >= 100){
+        mgr->cctb.effectVal.loopDirection = 1;
+    }
+    else if(mgr->cctb.color.val.b <= 0){
+        mgr->cctb.effectVal.loopDirection = 0;
+    }
+    mgr->cctb.color.val.b = (mgr->cctb.effectVal.loopDirection ? mgr->cctb.color.val.b - 1 : mgr->cctb.color.val.b + 1);
+    mgr->setColorInternal(mgr->cctb.color);
+    mgr->portMgr.timer.execute();
+}
+
+template <>
+void colorBaseMgr::setBrightnessLoop<colorType::CCTB>(uint16_t loopMs)
+{
+    using brightnessLoopCallbackType = void (*)(void *);
+
+    portMgr.timer.stopExecute();
+    this->colorMode = colorType::CCTB;
+    this->effectMode = colorEffectMode::BRIGHTNESSLOOP;
+    this->cctb.color.val.b = 0;
+    if(loopMs)
+        this->cctb.effectVal.brightnessLoopMs = loopMs;
+
+    portMgr.timer.setExecuteTime((this->cctb.effectVal.brightnessLoopMs / 100) > 0 ? (this->cctb.effectVal.brightnessLoopMs / 100) : 1);
+
+    portMgr.timer.setCallback(reinterpret_cast<brightnessLoopCallbackType>(colorBaseMgr::brightnessLoopCallback<colorType::CCTB>));
+
+    portMgr.timer.execute();
+
 }
 
 template <>

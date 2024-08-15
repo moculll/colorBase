@@ -17,7 +17,7 @@ enum class colorType {
     RGB,
     HSV,
     CW,
-    CCTB
+    CCTB,
 }; /* enum class colorType */
 
 template <colorType T>
@@ -54,7 +54,7 @@ struct Color<colorType::RGB> : public ColorBaseType<colorType::RGB> {
 protected:
     void assign(const ColorBaseType<colorType::RGB>& src) override
     {
-        const Color<colorType::RGB>* pSrc = static_cast<const Color<colorType::RGB>*>(&src);
+        const Color<colorType::RGB>* pSrc = static_cast<const Color<colorType::RGB> *>(&src);
         val = pSrc->val;
     }
 };
@@ -77,7 +77,7 @@ struct Color<colorType::HSV> : public ColorBaseType<colorType::HSV> {
 protected:
     void assign(const ColorBaseType<colorType::HSV>& src) override
     {
-        const Color<colorType::HSV>* pSrc = static_cast<const Color<colorType::HSV>*>(&src);
+        const Color<colorType::HSV>* pSrc = static_cast<const Color<colorType::HSV> *>(&src);
         val = pSrc->val;
     }
 };
@@ -99,7 +99,7 @@ struct Color<colorType::CCTB> : public ColorBaseType<colorType::CCTB> {
 protected:
     void assign(const ColorBaseType<colorType::CCTB>& src) override
     {
-        const Color<colorType::CCTB>* pSrc = static_cast<const Color<colorType::CCTB>*>(&src);
+        const Color<colorType::CCTB>* pSrc = static_cast<const Color<colorType::CCTB> *>(&src);
         val = pSrc->val;
     }
 }; 
@@ -121,7 +121,7 @@ struct Color<colorType::CW> : public ColorBaseType<colorType::CW> {
 protected:
     void assign(const ColorBaseType<colorType::CW>& src) override
     {
-        const Color<colorType::CW>* pSrc = static_cast<const Color<colorType::CW>*>(&src);
+        const Color<colorType::CW>* pSrc = static_cast<const Color<colorType::CW> *>(&src);
         val = pSrc->val;
     }
 }; /* struct Color */
@@ -137,17 +137,15 @@ enum class colorEffectMode {
 
 template <colorType T>
 struct colorEffectVal {
-    
-
     uint16_t linearStep;
     uint16_t linearIntervalMs;
     uint16_t linearMs;
     uint8_t loopDirection;
-    uint16_t loopMs;
+    uint16_t colorLoopMs;
+    uint16_t brightnessLoopMs;
     Color<T> target;
     
-
-    colorEffectVal() : linearStep(0), linearIntervalMs(10), linearMs(1000) {}
+    colorEffectVal() : linearStep(0), linearIntervalMs(10), linearMs(1000), colorLoopMs(720), brightnessLoopMs(200) {}
 }; /* struct colorEffectVal */
 
 
@@ -172,7 +170,6 @@ void convert(const Color<colorType::RGB> &src, Color<colorType::HSV> &tar);
 void convert(const Color<colorType::HSV> &src,  Color<colorType::RGB> &tar);
 void convert(const Color<colorType::CCTB> &src, Color<colorType::CW> &tar);
 void convert(const Color<colorType::CW> &src, Color<colorType::CCTB> &tar);
-
 } /* effects */
 
 
@@ -223,6 +220,8 @@ public:
     template <colorType T>
     void getColor(Color<T> &dst);
 
+    inline colorEffectMode getCurrentEffectMode() { return this->effectMode; }
+
     void setBrightness(uint8_t brightness);
     void setBrightnessLinear(uint8_t brightness);
 
@@ -241,12 +240,13 @@ public:
     static void colorLoopCallback(void *arg);
     template <colorType>
     void setColorLoop(uint16_t loopMs);
+
+    template <colorType>
+    static void brightnessLoopCallback(void *arg);
+    template <colorType>
+    void setBrightnessLoop(uint16_t loopMs);
     
-    
-    inline std::map<int, int> *getGammaMap()
-    {
-        return &this->gammaTable;
-    };
+    inline std::map<int, int> *getGammaMap() { return &this->gammaTable; };
 
    
 private:
@@ -264,22 +264,10 @@ private:
     std::map<int, int> gammaTable;
     
     /* internal setcolor callback impl for port */
-    inline void setColorCallback(hookCallback<colorType::RGB> cb)
-    {
-        this->rgb.cbImpl = cb;
-    }
-    inline void setColorCallback(hookCallback<colorType::HSV> cb)
-    {
-        this->hsv.cbImpl = cb;
-    }
-    inline void setColorCallback(hookCallback<colorType::CCTB> cb)
-    {
-        this->cctb.cbImpl = cb;
-    }
-    inline void setColorCallback(hookCallback<colorType::CW> cb)
-    {
-        this->cw.cbImpl = cb;
-    }
+    inline void setColorCallback(hookCallback<colorType::RGB> cb) { this->rgb.cbImpl = cb; }
+    inline void setColorCallback(hookCallback<colorType::HSV> cb) { this->hsv.cbImpl = cb; }
+    inline void setColorCallback(hookCallback<colorType::CCTB> cb) { this->cctb.cbImpl = cb; }
+    inline void setColorCallback(hookCallback<colorType::CW> cb) { this->cw.cbImpl = cb; }
 
 }; /* class colorBaseMgr */
 

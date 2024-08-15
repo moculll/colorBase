@@ -64,6 +64,12 @@ int main(int argc, char *argv[])
 
         testcl testclass;
         testclass.color.init();
+        testclass.color.setColorLoop<colorType::HSV>(0);
+        TEST_SLEEP(3000);
+        testclass.color.setBrightnessLoop<colorType::HSV>(4800);
+        TEST_SLEEP(5000);
+        testclass.color.setBrightnessLoop<colorType::CCTB>(4000);
+        TEST_SLEEP(5000);
         testclass.color.setOnoffLinear(false);
         testclass.color.setColorLinear(cw);
         testclass.color.setOnoffLinear(false);
