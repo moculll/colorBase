@@ -99,14 +99,14 @@ public:
         timer_create (CLOCK_REALTIME, &te, &timerID);
 
         if(type == TIMER_TYPE_PERIODIC){
-            value.it_value.tv_sec = 0;
-            value.it_value.tv_nsec = intervalMs * 1000000;
-            value.it_interval.tv_sec = 0;
-            value.it_interval.tv_nsec = intervalMs * 1000000;
+            value.it_value.tv_sec = intervalMs / 1000;
+            value.it_value.tv_nsec = intervalMs % 1000 * 1000000;
+            value.it_interval.tv_sec = intervalMs / 1000;
+            value.it_interval.tv_nsec = intervalMs % 1000 * 1000000;
         }
         else if(type == TIMER_TYPE_ONESHOT){
-            value.it_value.tv_sec = 0;
-            value.it_value.tv_nsec = intervalMs * 1000000;
+            value.it_value.tv_sec = intervalMs / 1000;
+            value.it_value.tv_nsec = intervalMs % 1000 * 1000000;
             value.it_interval.tv_sec = 0;
             value.it_interval.tv_nsec = 0;
         }

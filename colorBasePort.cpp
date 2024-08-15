@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <time.h>
+
 #define COLORBASEPORT_PRINT 1
 #if COLORBASEPORT_PRINT
 #define CBD_PRINT(format, ...) \
@@ -74,7 +76,7 @@ void colorBasePortMgr::initImpl(colorBaseMgr &mgr)
     mgr.setColorCallback(colorCallbackImpl<colorType::CW>);
     colorBasePort::gammaTable = mgr.getGammaMap();
     makeGammaTable(*colorBasePort::gammaTable, 256, 1.0, 8);
-    (*colorBasePort::gammaTable)[255] -= 1;
+    (*colorBasePort::gammaTable)[2^8 - 1] -= 1;
 
 #if COLORBASEPORT_PRINT
     for (auto it = colorBasePort::gammaTable->begin(); it != colorBasePort::gammaTable->end(); ++it) {
@@ -84,5 +86,37 @@ void colorBasePortMgr::initImpl(colorBaseMgr &mgr)
 
 }
 
+void colorBasePortMgr::initImpl(colorBaseMgr &mgr, uint8_t bitDepth)
+{
+    mgr.setColorCallback(colorCallbackImpl<colorType::RGB>);
+    mgr.setColorCallback(colorCallbackImpl<colorType::HSV>);
+    mgr.setColorCallback(colorCallbackImpl<colorType::CCTB>);
+    mgr.setColorCallback(colorCallbackImpl<colorType::CW>);
+    colorBasePort::gammaTable = mgr.getGammaMap();
+    makeGammaTable(*colorBasePort::gammaTable, 256, 1.0, bitDepth);
+    (*colorBasePort::gammaTable)[2^bitDepth - 1] -= 1;
+    
+#if COLORBASEPORT_PRINT
+    for (auto it = colorBasePort::gammaTable->begin(); it != colorBasePort::gammaTable->end(); ++it) {
+        CBD_PRINT("[gammaTable] key: %d, value: %d", it->first, it->second);
+    }
+#endif
+
+}
+
+int colorBasePortMgr::getRandom(int min, int max)
+{
+    int tmp;
+    int random = rand();
+
+    if(min == max)
+        return max;
+    if(min > max){
+        tmp = min;
+        min = max;
+        max = tmp;
+    }
+    return random % (max - min + 1) + min;
+}
 
 } /* colorBase */

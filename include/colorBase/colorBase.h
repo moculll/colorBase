@@ -137,15 +137,18 @@ enum class colorEffectMode {
 
 template <colorType T>
 struct colorEffectVal {
-    uint16_t linearStep;
-    uint16_t linearIntervalMs;
-    uint16_t linearMs;
+    uint32_t linearStep;
+    uint32_t linearIntervalMs;
+    uint32_t linearMs;
+    
+    uint32_t colorLoopMs;
+    uint32_t brightnessLoopMs;
     uint8_t loopDirection;
-    uint16_t colorLoopMs;
-    uint16_t brightnessLoopMs;
+    bool random;
+
     Color<T> target;
     
-    colorEffectVal() : linearStep(0), linearIntervalMs(10), linearMs(1000), colorLoopMs(720), brightnessLoopMs(200) {}
+    colorEffectVal() : linearStep(0), linearIntervalMs(10), linearMs(1000), colorLoopMs(720), brightnessLoopMs(200), random(false) {}
 }; /* struct colorEffectVal */
 
 
@@ -186,6 +189,12 @@ public:
     void init()
     {
         portMgr.initImpl(*this);
+        this->portMgr.timer.setObj((void *)this);
+    }
+
+    void init(uint8_t bitDepth)
+    {
+        portMgr.initImpl(*this, bitDepth);
         this->portMgr.timer.setObj((void *)this);
     }
 
@@ -239,15 +248,16 @@ public:
     template <colorType>
     static void colorLoopCallback(void *arg);
     template <colorType>
-    void setColorLoop(uint16_t loopMs);
+    void setColorLoop(uint32_t loopMs, bool random);
 
     template <colorType>
     static void brightnessLoopCallback(void *arg);
     template <colorType>
-    void setBrightnessLoop(uint16_t loopMs);
+    void setBrightnessLoop(uint32_t loopMs, bool random);
     
     inline std::map<int, int> *getGammaMap() { return &this->gammaTable; };
 
+    static inline int getRandom(int min, int max) { return colorBase::colorBasePortMgr::getRandom(min, max); }
    
 private:
     

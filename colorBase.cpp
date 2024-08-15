@@ -139,17 +139,21 @@ template <>
 void colorBaseMgr::colorLoopCallback<colorType::HSV>(void *arg)
 {
     colorBaseMgr *mgr = (colorBaseMgr *)arg;
-    
-    mgr->hsv.color.val.h = (mgr->hsv.effectVal.loopDirection ? \
-        (mgr->hsv.color.val.h >= 360 ? 0 : mgr->hsv.color.val.h + 1) : (mgr->hsv.color.val.h <= 0 ? 360 : mgr->hsv.color.val.h - 1) 
-    );
-    
+    if(mgr->hsv.effectVal.random) {
+        mgr->hsv.color.val.h = colorBaseMgr::getRandom(0, 359);
+        mgr->hsv.color.val.s = colorBaseMgr::getRandom(0, 100);
+    }
+    else {
+        mgr->hsv.color.val.h = (mgr->hsv.effectVal.loopDirection ? \
+            (mgr->hsv.color.val.h >= 360 ? 0 : mgr->hsv.color.val.h + 1) : (mgr->hsv.color.val.h <= 0 ? 360 : mgr->hsv.color.val.h - 1) 
+        );
+    }
     mgr->setColorInternal(mgr->hsv.color);
     mgr->portMgr.timer.execute();
 }
 
 template <>
-void colorBaseMgr::setColorLoop<colorType::HSV>(uint16_t loopMs)
+void colorBaseMgr::setColorLoop<colorType::HSV>(uint32_t loopMs, bool random)
 {
     using colorLoopCallbackType = void (*)(void *);
 
@@ -160,7 +164,7 @@ void colorBaseMgr::setColorLoop<colorType::HSV>(uint16_t loopMs)
     this->hsv.effectVal.loopDirection = 1;
     if(loopMs)
         this->hsv.effectVal.colorLoopMs = loopMs;
-
+    this->hsv.effectVal.random = random;
 
     portMgr.timer.setExecuteTime((this->hsv.effectVal.colorLoopMs / 360) > 0 ? (this->hsv.effectVal.colorLoopMs / 360) : 1);
 
@@ -173,19 +177,24 @@ template <>
 void colorBaseMgr::brightnessLoopCallback<colorType::HSV>(void *arg)
 {
     colorBaseMgr *mgr = (colorBaseMgr *)arg;
-    if(mgr->hsv.color.val.v >= 100){
-        mgr->hsv.effectVal.loopDirection = 1;
+    if(mgr->hsv.effectVal.random) {
+        mgr->hsv.color.val.v = colorBaseMgr::getRandom(0, 100);
     }
-    else if(mgr->hsv.color.val.v <= 0){
-        mgr->hsv.effectVal.loopDirection = 0;
+    else {
+        if(mgr->hsv.color.val.v >= 100) {
+            mgr->hsv.effectVal.loopDirection = 1;
+        }
+        else if(mgr->hsv.color.val.v <= 0) {
+            mgr->hsv.effectVal.loopDirection = 0;
+        }
+        mgr->hsv.color.val.v = (mgr->hsv.effectVal.loopDirection ? mgr->hsv.color.val.v - 1 : mgr->hsv.color.val.v + 1);
     }
-    mgr->hsv.color.val.v = (mgr->hsv.effectVal.loopDirection ? mgr->hsv.color.val.v - 1 : mgr->hsv.color.val.v + 1);
     mgr->setColorInternal(mgr->hsv.color);
     mgr->portMgr.timer.execute();
 }
 
 template <>
-void colorBaseMgr::setBrightnessLoop<colorType::HSV>(uint16_t loopMs)
+void colorBaseMgr::setBrightnessLoop<colorType::HSV>(uint32_t loopMs, bool random)
 {
     using brightnessLoopCallbackType = void (*)(void *);
 
@@ -195,7 +204,7 @@ void colorBaseMgr::setBrightnessLoop<colorType::HSV>(uint16_t loopMs)
     this->hsv.color.val.v = 0;
     if(loopMs)
         this->hsv.effectVal.brightnessLoopMs = loopMs;
-
+    this->hsv.effectVal.random = random;
     portMgr.timer.setExecuteTime((this->hsv.effectVal.brightnessLoopMs / 100) > 0 ? (this->hsv.effectVal.brightnessLoopMs / 100) : 1);
 
     portMgr.timer.setCallback(reinterpret_cast<brightnessLoopCallbackType>(colorBaseMgr::brightnessLoopCallback<colorType::HSV>));
@@ -208,19 +217,25 @@ template <>
 void colorBaseMgr::brightnessLoopCallback<colorType::CCTB>(void *arg)
 {
     colorBaseMgr *mgr = (colorBaseMgr *)arg;
-    if(mgr->cctb.color.val.b >= 100){
-        mgr->cctb.effectVal.loopDirection = 1;
+    if(mgr->cctb.effectVal.random) {
+        mgr->cctb.color.val.b = colorBaseMgr::getRandom(0, 100);
     }
-    else if(mgr->cctb.color.val.b <= 0){
-        mgr->cctb.effectVal.loopDirection = 0;
+    else {
+        if(mgr->cctb.color.val.b >= 100) {
+            mgr->cctb.effectVal.loopDirection = 1;
+        }
+        else if(mgr->cctb.color.val.b <= 0) {
+            mgr->cctb.effectVal.loopDirection = 0;
+        }
+        mgr->cctb.color.val.b = (mgr->cctb.effectVal.loopDirection ? mgr->cctb.color.val.b - 1 : mgr->cctb.color.val.b + 1);
     }
-    mgr->cctb.color.val.b = (mgr->cctb.effectVal.loopDirection ? mgr->cctb.color.val.b - 1 : mgr->cctb.color.val.b + 1);
+    
     mgr->setColorInternal(mgr->cctb.color);
     mgr->portMgr.timer.execute();
 }
 
 template <>
-void colorBaseMgr::setBrightnessLoop<colorType::CCTB>(uint16_t loopMs)
+void colorBaseMgr::setBrightnessLoop<colorType::CCTB>(uint32_t loopMs, bool random)
 {
     using brightnessLoopCallbackType = void (*)(void *);
 
@@ -230,6 +245,7 @@ void colorBaseMgr::setBrightnessLoop<colorType::CCTB>(uint16_t loopMs)
     this->cctb.color.val.b = 0;
     if(loopMs)
         this->cctb.effectVal.brightnessLoopMs = loopMs;
+    this->cctb.effectVal.random = random;
 
     portMgr.timer.setExecuteTime((this->cctb.effectVal.brightnessLoopMs / 100) > 0 ? (this->cctb.effectVal.brightnessLoopMs / 100) : 1);
 
@@ -372,6 +388,9 @@ void colorBaseMgr::colorLinearCallback<colorType::HSV>(void *arg)
     CB_PRINT("linearStep: %d", mgr->hsv.effectVal.linearStep);
     if(--mgr->hsv.effectVal.linearStep && mgr->portMgr.timer.getRunningStatus())
         mgr->portMgr.timer.execute();
+    else {
+        mgr->onoff = (!mgr->hsv.effectVal.target.val.v) ? false : (!mgr->hsv.effectVal.target.val.s ? false : true);
+    }
     
 }
 
@@ -379,7 +398,7 @@ void colorBaseMgr::setColorLinear(const Color<colorType::HSV> &tar)
 {
     using linearCallbackType = void (*)(void *);
     bool prevOnoff = this->onoff;
-    this->onoff = (!tar.val.v) ? false : true;
+    this->onoff = true;
     if(this->onoff == prevOnoff && !prevOnoff && (static_cast<int>(this->effectMode) & (static_cast<int>(colorEffectMode::NORMAL) | static_cast<int>(colorEffectMode::LINEAR))))
         return;
     this->portMgr.timer.stopExecute();
@@ -401,6 +420,7 @@ void colorBaseMgr::setColorLinear(const Color<colorType::HSV> &tar)
 
     this->portMgr.timer.execute(); 
 }
+
 
 template <>
 void colorBaseMgr::colorLinearCallback<colorType::CCTB>(void *arg)
@@ -491,16 +511,16 @@ void colorBaseMgr::setColorLinear(const Color<colorType::CW> &tar)
 void colorBaseMgr::setOnoff(bool onoff)
 {
     CB_PRINT("set onoff: %d", onoff ? 1 : 0);
-    if(this->colorMode == colorType::RGB){
+    if(this->colorMode == colorType::RGB) {
         this->setColor(onoff ? (this->rgb.prevColor) : (Color<colorBase::colorType::RGB>(0, 0, 0)));
     }
-    else if(this->colorMode == colorType::HSV){
+    else if(this->colorMode == colorType::HSV) {
         this->setColor(onoff ? (this->hsv.prevColor) : (Color<colorBase::colorType::HSV>(0, 0, 0)));
     }
-    else if(this->colorMode == colorType::CCTB){
+    else if(this->colorMode == colorType::CCTB) {
         this->setColor(onoff ? (this->cctb.prevColor) : (Color<colorBase::colorType::CCTB>(0, 0)));
     }
-    else if(this->colorMode == colorType::CW){
+    else if(this->colorMode == colorType::CW) {
         this->setColor(onoff ? (this->cw.prevColor) : (Color<colorBase::colorType::CW>(0, 0)));
     }
 
@@ -509,16 +529,16 @@ void colorBaseMgr::setOnoff(bool onoff)
 void colorBaseMgr::setOnoffLinear(bool onoff)
 {
     CB_PRINT("set onoff linear: %d", onoff ? 1 : 0);
-    if(this->colorMode == colorType::RGB){
+    if(this->colorMode == colorType::RGB) {
         this->setColorLinear(onoff ? (this->rgb.prevColor) : (Color<colorBase::colorType::RGB>(0, 0, 0)));
     }
-    else if(this->colorMode == colorType::HSV){
+    else if(this->colorMode == colorType::HSV) {
         this->setColorLinear(onoff ? (this->hsv.prevColor) : (Color<colorBase::colorType::HSV>(0, 0, 0)));
     }
-    else if(this->colorMode == colorType::CCTB){
+    else if(this->colorMode == colorType::CCTB) {
         this->setColorLinear(onoff ? (this->cctb.prevColor) : (Color<colorBase::colorType::CCTB>(0, 0)));
     }
-    else if(this->colorMode == colorType::CW){
+    else if(this->colorMode == colorType::CW) {
         this->setColorLinear(onoff ? (this->cw.prevColor) : (Color<colorBase::colorType::CW>(0, 0)));
     }
 
@@ -527,24 +547,24 @@ void colorBaseMgr::setOnoffLinear(bool onoff)
 void colorBaseMgr::setBrightness(uint8_t brightness)
 {
     CB_PRINT("set brightness: %d", brightness);
-    if(this->colorMode == colorType::RGB){
+    if(this->colorMode == colorType::RGB) {
         Color<colorBase::colorType::RGB> tar;
         effects::convert(this->rgb.color, this->hsv.color);
         this->hsv.color.val.v = brightness;
         effects::convert(this->hsv.color, tar);
         this->setColor(tar);
     }
-    else if(this->colorMode == colorType::HSV){
+    else if(this->colorMode == colorType::HSV) {
         Color<colorBase::colorType::HSV> tar = this->hsv.color;
         tar.val.v = brightness;
         this->setColor(tar);
     }
-    else if(this->colorMode == colorType::CCTB){
+    else if(this->colorMode == colorType::CCTB) {
         Color<colorBase::colorType::CCTB> tar = this->cctb.color;
         tar.val.b = brightness;
         this->setColor(tar);
     }
-    else if(this->colorMode == colorType::CW){
+    else if(this->colorMode == colorType::CW) {
         Color<colorBase::colorType::CW> tar;
         effects::convert(this->cw.color, this->cctb.color);
         this->cctb.color.val.b = brightness;
@@ -557,24 +577,24 @@ void colorBaseMgr::setBrightness(uint8_t brightness)
 void colorBaseMgr::setBrightnessLinear(uint8_t brightness)
 {
     CB_PRINT("set brightness linear: %d", brightness);
-    if(this->colorMode == colorType::RGB){
+    if(this->colorMode == colorType::RGB) {
         Color<colorBase::colorType::RGB> tar;
         effects::convert(this->rgb.color, this->hsv.color);
         this->hsv.color.val.v = brightness;
         effects::convert(this->hsv.color, tar);
         this->setColorLinear(tar);
     }
-    else if(this->colorMode == colorType::HSV){
+    else if(this->colorMode == colorType::HSV) {
         Color<colorBase::colorType::HSV> tar = this->hsv.color;
         tar.val.v = brightness;
         this->setColorLinear(tar);
     }
-    else if(this->colorMode == colorType::CCTB){
+    else if(this->colorMode == colorType::CCTB) {
         Color<colorBase::colorType::CCTB> tar = this->cctb.color;
         tar.val.b = brightness;
         this->setColorLinear(tar);
     }
-    else if(this->colorMode == colorType::CW){
+    else if(this->colorMode == colorType::CW) {
         Color<colorBase::colorType::CW> tar;
         effects::convert(this->cw.color, this->cctb.color);
         this->cctb.color.val.b = brightness;
@@ -584,25 +604,28 @@ void colorBaseMgr::setBrightnessLinear(uint8_t brightness)
 
 }
 
-template<>
+
+
+
+template <>
 void colorBaseMgr::getColor(Color<colorType::RGB> &dst)
 {
     dst = this->rgb.color;
 }
 
-template<>
+template <>
 void colorBaseMgr::getColor(Color<colorType::HSV> &dst)
 {
     dst = this->hsv.color;
 }
 
-template<>
+template <>
 void colorBaseMgr::getColor(Color<colorType::CCTB> &dst)
 {
     dst = this->cctb.color;
 }
 
-template<>
+template <>
 void colorBaseMgr::getColor(Color<colorType::CW> &dst)
 {
     dst = this->cw.color;
