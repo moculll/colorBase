@@ -47,7 +47,7 @@ this module is for colorEffects like color linear / color loop etc.
 ```
 # colorBasePort.cpp
 
-1. [void colorBase::colorBasePort::colorCallbackImpl<colorType>(const Color<colorType &)]
+1. [void colorBase::colorBasePort::colorCallbackImpl<colorType>(const Color<colorType> &)]
 (notice that if we want to uniform color type, you can call colorBase::effects::convert() in other impl functions)
 
 2. [int colorBasePortMgr::getRandom(int, int)]

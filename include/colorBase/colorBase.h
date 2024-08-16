@@ -23,9 +23,8 @@ enum class colorType {
 template <colorType T>
 struct ColorBaseType {
     ColorBaseType<T> &operator=(const ColorBaseType<T> &src) {
-        if(this != &src) {
+        if(this != &src)
             assign(src);
-        }
         return *this;
     }
 protected:
@@ -69,7 +68,7 @@ struct Color<colorType::RGB> : public ColorBaseType<colorType::RGB> {
         return *this;
     }
 protected:
-    void assign(const ColorBaseType<colorType::RGB> &src) override
+    inline void assign(const ColorBaseType<colorType::RGB> &src) override
     {
         const Color<colorType::RGB>* pSrc = static_cast<const Color<colorType::RGB> *>(&src);
         val = pSrc->val;
@@ -135,7 +134,7 @@ struct Color<colorType::CCTB> : public ColorBaseType<colorType::CCTB> {
 
     bool operator==(const Color<colorType::CCTB> &cctb) const
     {
-        return this->val.cct == cctb.val.cct && this->val.b == cctb.val.b;
+        return (this->val.cct == cctb.val.cct) && (this->val.b == cctb.val.b);
     }
 
     inline bool isOn() const
@@ -150,7 +149,7 @@ struct Color<colorType::CCTB> : public ColorBaseType<colorType::CCTB> {
         return *this;
     }
 protected:
-    void assign(const ColorBaseType<colorType::CCTB>& src) override
+    inline void assign(const ColorBaseType<colorType::CCTB>& src) override
     {
         const Color<colorType::CCTB>* pSrc = static_cast<const Color<colorType::CCTB> *>(&src);
         val = pSrc->val;
@@ -189,7 +188,7 @@ struct Color<colorType::CW> : public ColorBaseType<colorType::CW> {
         return *this;
     }
 protected:
-    void assign(const ColorBaseType<colorType::CW>& src) override
+    inline void assign(const ColorBaseType<colorType::CW>& src) override
     {
         const Color<colorType::CW>* pSrc = static_cast<const Color<colorType::CW> *>(&src);
         val = pSrc->val;
@@ -330,7 +329,7 @@ public:
 
     static inline int getRandom(int min, int max) { return colorBase::colorBasePortMgr::getRandom(min, max); }
     
-    void debugPrintMgrAllInfos();
+    
 private:
     
     colorType colorMode;
@@ -345,12 +344,13 @@ private:
     colorBasePortMgr portMgr;
     std::map<int, int> gammaTable;
     
-    /* internal setcolor callback impl for port */
+    /* internal setcolor callback impl for porting */
     inline void setColorCallback(hookCallback<colorType::RGB> cb) { this->rgb.cbImpl = cb; }
     inline void setColorCallback(hookCallback<colorType::HSV> cb) { this->hsv.cbImpl = cb; }
     inline void setColorCallback(hookCallback<colorType::CCTB> cb) { this->cctb.cbImpl = cb; }
     inline void setColorCallback(hookCallback<colorType::CW> cb) { this->cw.cbImpl = cb; }
-
+    
+    void debugPrintMgrAllInfos();
 }; /* class colorBaseMgr */
 
 

@@ -383,7 +383,7 @@ void colorBaseMgr::colorLinearCallback<colorType::RGB>(void *arg)
     
     mgr->setColorInternal(mgr->rgb.color);
     
-    if(!mgr->rgb.color.isOn()){
+    if(!mgr->rgb.color.isOn()) {
         mgr->onoff = false;
         CB_PRINT("set end onoff to %d", mgr->onoff ? 1 : 0);
     }
@@ -401,7 +401,7 @@ void colorBaseMgr::setColorLinear(const Color<colorType::RGB> &tar)
         && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
         || (this->rgb.color == tar) \
     ) return;
-    if(!nextOnoff){
+    if(!nextOnoff) {
         this->rgb.prevColor = this->rgb.color;
         CB_PRINT("set prev to new: %d, %d, %d", this->rgb.prevColor.val.r, this->rgb.prevColor.val.g, this->rgb.prevColor.val.b);
     }
@@ -431,12 +431,12 @@ void colorBaseMgr::colorLinearCallback<colorType::HSV>(void *arg)
     if(!mgr->hsv.effectVal.linearStep)
         return;
     
-    mgr->hsv.color.val.h += (int16_t)(mgr->hsv.effectVal.target.val.h - mgr->hsv.color.val.h) / (int16_t)mgr->hsv.effectVal.linearStep;
-    mgr->hsv.color.val.s += (int8_t)(mgr->hsv.effectVal.target.val.s - mgr->hsv.color.val.s) / (int8_t)mgr->hsv.effectVal.linearStep;
-    mgr->hsv.color.val.v += (int8_t)(mgr->hsv.effectVal.target.val.v - mgr->hsv.color.val.v) / (int8_t)mgr->hsv.effectVal.linearStep;
+    mgr->hsv.color.val.h += ((int16_t)mgr->hsv.effectVal.target.val.h - (int16_t)mgr->hsv.color.val.h) / (int16_t)mgr->hsv.effectVal.linearStep;
+    mgr->hsv.color.val.s += ((int8_t)mgr->hsv.effectVal.target.val.s - (int8_t)mgr->hsv.color.val.s) / (int8_t)mgr->hsv.effectVal.linearStep;
+    mgr->hsv.color.val.v += ((int8_t)mgr->hsv.effectVal.target.val.v - (int8_t)mgr->hsv.color.val.v) / (int8_t)mgr->hsv.effectVal.linearStep;
     
     mgr->setColorInternal(mgr->hsv.color);
-    if(!mgr->hsv.color.isOn()){
+    if(!mgr->hsv.color.isOn()) {
         mgr->onoff = false;
         CB_PRINT("set end onoff to %d", mgr->onoff ? 1 : 0);
     }
@@ -456,7 +456,7 @@ void colorBaseMgr::setColorLinear(const Color<colorType::HSV> &tar)
         || (this->hsv.color == tar) \
     ) return;
 
-    if(!nextOnoff){
+    if(!nextOnoff) {
         this->hsv.prevColor = this->hsv.color;
         CB_PRINT("set prev to new: %d, %d, %d", this->hsv.prevColor.val.h, this->hsv.prevColor.val.s, this->hsv.prevColor.val.v);
     }
@@ -488,11 +488,11 @@ void colorBaseMgr::colorLinearCallback<colorType::CCTB>(void *arg)
         return;
     /* CB_PRINT("set cctb: %d, %d", mgr->cctb.color.val.cct, mgr->cctb.color.val.b); */
     /* mgr->debugPrintMgrAllInfos(); */
-    mgr->cctb.color.val.cct += (int16_t)(mgr->cctb.effectVal.target.val.cct - mgr->cctb.color.val.cct) / (int16_t)mgr->cctb.effectVal.linearStep;
-    mgr->cctb.color.val.b += (int16_t)(mgr->cctb.effectVal.target.val.b - mgr->cctb.color.val.b) / (int16_t)mgr->cctb.effectVal.linearStep;
+    mgr->cctb.color.val.cct += ((int16_t)mgr->cctb.effectVal.target.val.cct - (int16_t)mgr->cctb.color.val.cct) / (int16_t)mgr->cctb.effectVal.linearStep;
+    mgr->cctb.color.val.b += ((int16_t)mgr->cctb.effectVal.target.val.b - (int16_t)mgr->cctb.color.val.b) / (int16_t)mgr->cctb.effectVal.linearStep;
 
     mgr->setColorInternal(mgr->cctb.color);
-    if(!mgr->cctb.color.isOn()){
+    if(!mgr->cctb.color.isOn()) {
         mgr->onoff = false;
         CB_PRINT("set end onoff to %d", mgr->onoff ? 1 : 0);
     }
@@ -511,7 +511,7 @@ void colorBaseMgr::setColorLinear(const Color<colorType::CCTB> &tar)
         || (this->cctb.color == tar) \
     ) return;
 
-    if(!nextOnoff){
+    if(!nextOnoff) {
         this->cctb.prevColor = this->cctb.color;
         CB_PRINT("set prev to new: %d, %d", this->cctb.prevColor.val.cct, this->cctb.prevColor.val.b);
     }
@@ -540,11 +540,11 @@ void colorBaseMgr::colorLinearCallback<colorType::CW>(void *arg)
     colorBaseMgr *mgr = (colorBaseMgr *)arg;
     if(!mgr->cw.effectVal.linearStep)
         return;
-    mgr->cw.color.val.c += (int16_t)(mgr->cw.effectVal.target.val.c - mgr->cw.color.val.c) / (int16_t)mgr->cw.effectVal.linearStep;
-    mgr->cw.color.val.w += (int16_t)(mgr->cw.effectVal.target.val.w - mgr->cw.color.val.w) / (int16_t)mgr->cw.effectVal.linearStep;
+    mgr->cw.color.val.c += ((int16_t)mgr->cw.effectVal.target.val.c - (int16_t)mgr->cw.color.val.c) / (int16_t)mgr->cw.effectVal.linearStep;
+    mgr->cw.color.val.w += ((int16_t)mgr->cw.effectVal.target.val.w - (int16_t)mgr->cw.color.val.w) / (int16_t)mgr->cw.effectVal.linearStep;
 
     mgr->setColorInternal(mgr->cw.color);
-    if(!mgr->cw.color.isOn()){
+    if(!mgr->cw.color.isOn()) {
         mgr->onoff = false;
         CB_PRINT("set end onoff to %d", mgr->onoff ? 1 : 0);
     }
@@ -556,12 +556,15 @@ void colorBaseMgr::colorLinearCallback<colorType::CW>(void *arg)
 void colorBaseMgr::setColorLinear(const Color<colorType::CW> &tar)
 {
     using linearCallbackType = void (*)(void *);
+
     bool nextOnoff = tar.isOn() ? true : false;
+
     if(this->onoff == nextOnoff && !nextOnoff \
         && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
         || (this->cw.color == tar) \
     ) return;
-    if(!nextOnoff){
+
+    if(!nextOnoff) {
         this->cw.prevColor = this->cw.color;
         CB_PRINT("set prev to new: %d, %d", this->cw.prevColor.val.c, this->cw.prevColor.val.w);
     }
