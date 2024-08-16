@@ -2,8 +2,8 @@
 - ### Test Environment: Ubuntu 22.04 / Windows 10
 - ### currently compile support:
 ```
-1. vscode + cmake Extension on Windows/Linux
-2. makefile on Linux
+1. vscode(cmakeExtension) on Windows/Linux
+2. makefile/cmake on Linux
 ```
 ## Usage
 ```
@@ -20,7 +20,6 @@ git clone https://github.com/moculll/colorBase.git
 cmake -G Ninja -S . -B build
 cmake --build build
 ./build/colorBase
-
 ```
 
 or
@@ -39,16 +38,19 @@ click the run button in the left buttom of vscode to run
 - #### TimerEvents
 this module is for colorEffects like color linear / color loop etc.
 ```
+# TimerEvents.h
 
-1. we need to implement the class TimerEvents, just make sure its start/stop functions work is enough
+1. [class TimerEvents]
 ```
 
 - #### colorBasePort
-what we need to focus on colorBasePort only is the colorBasePort.cpp
 ```
-1. we need to implement colorCallbackImpl<>, which template(rgb/hsv/cctb/cw) to impl depends on which color type you actually call in your application
+# colorBasePort.cpp
+
+1. [void colorBase::colorBasePort::colorCallbackImpl<colorType>(const Color<colorType &)]
 (notice that if we want to uniform color type, you can call colorBase::effects::convert() in other impl functions)
 
-2. since many of color devices may not use standard color range, we have makeGammaTable in colorBasePort.cpp, if your device receives 0-255, call makeGammaTable(*colorBasePort::gammaTable, 256, 1.0, 8) is enough
+2. [int colorBasePortMgr::getRandom(int, int)]
+(this is for effects that randomly generate color vals)
 ```
 

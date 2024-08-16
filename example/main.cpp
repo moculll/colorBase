@@ -68,32 +68,51 @@ int main(int argc, char *argv[])
             printf("random: %d\r\n", testclass.color.getRandom(-5000, 10000));
             TEST_SLEEPUS(10000);
         } */
-        testclass.color.setColorLoop<colorType::HSV>(360000, true);
+        /* testclass.color.setColorLoop<colorType::HSV>(360000, true);
         testclass.color.setBrightnessLoop<colorType::HSV>(100000, true);
-        TEST_SLEEP(30000);
+        TEST_SLEEP(3);
         testclass.color.setColorLoop<colorType::HSV>(0, false);
-        TEST_SLEEP(3000);
+        TEST_SLEEP(3);
         testclass.color.setBrightnessLoop<colorType::HSV>(4800, false);
-        TEST_SLEEP(5000);
+        TEST_SLEEP(3);
         testclass.color.setBrightnessLoop<colorType::CCTB>(4000, false);
-        TEST_SLEEP(5000);
+        TEST_SLEEP(3);
         testclass.color.setOnoffLinear(false);
+        TEST_SLEEP(1);
         testclass.color.setColorLinear(cw);
+        TEST_SLEEP(1);
         testclass.color.setOnoffLinear(false);
+        TEST_SLEEP(1);
         testclass.color.setColorLoop<colorType::HSV>(3600, false);
+        TEST_SLEEP(1); */
         testclass.color.setColorLinear(rgb);
+        TEST_SLEEP(1);
+        testclass.color.setOnoffLinear(false);
+        TEST_SLEEP(1);
+        testclass.color.setOnoffLinear(true);
+        TEST_SLEEP(1);
+        testclass.color.setOnoff(true);
+        TEST_SLEEP(1);
+        testclass.color.setOnoffLinear(true);
+        TEST_SLEEP(1);
+        testclass.color.setOnoff(false);
+        TEST_SLEEP(1);
+        testclass.color.setOnoff(false);
+        TEST_SLEEP(1);
+        testclass.color.setOnoffLinear(true);
+        TEST_SLEEP(1);
         testclass.color.setBrightnessLinear(100);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(1);
         /* effects::convert(rgb, hsv);
         printf("r: %d, g: %d, b: %d, h: %d, s: %d, v: %d\n", rgb.val.r, rgb.val.g, rgb.val.b, hsv.val.h, hsv.val.s, hsv.val.v); */
         testclass.color.setColorLinear(hsv);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(1);
         testclass.color.setBrightnessLinear(100);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(1);
         testclass.color.setColorLinear(cw);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(1);
         testclass.color.setBrightnessLinear(50);
-        TEST_SLEEP(3000);
+        TEST_SLEEP(1);
 
         testclass.color.setColorLoop<colorType::HSV>(3600, false);
         testclass.color.setColorLinear(cw);
@@ -103,51 +122,51 @@ int main(int argc, char *argv[])
         cw = {0, 0};
 
         testclass.color.setOnoff(false);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(2);
         cw = {30, 50};
 
         testclass.color.setColorLinear(cw);
 
-        TEST_SLEEP(2000);
+        TEST_SLEEP(2);
  
         testclass.color.setOnoff(false);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(2);
         cw = {55, 22};
 
         testclass.color.setOnoff(true);
-        TEST_SLEEP(3000);
+        TEST_SLEEP(2);
         testclass.color.setColorLinear(cw);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(1);
         testclass.color.setOnoffLinear(false);
-        TEST_SLEEP(2000);
+        TEST_SLEEP(2);
         testclass.color.setOnoffLinear(true);
 
         testclass.color.setColorLinear(rgb);
-        TEST_SLEEP(3000);
+        TEST_SLEEP(3);
         rgb = {0, 0, 0};
 
         testclass.color.setOnoff(false);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(2);
         rgb = {30, 50, 213};
         testclass.color.setColorLoop<colorType::HSV>(3600, false);
 
         testclass.color.setColorLinear(rgb);
 
-        TEST_SLEEP(2000);
+        TEST_SLEEP(1);
 
         testclass.color.setOnoff(false);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(1);
         rgb = {55, 22, 123};
 
         testclass.color.setOnoff(true);
-        TEST_SLEEP(3000);
+        TEST_SLEEP(3);
         testclass.color.setColorLinear(rgb);
-        TEST_SLEEP(1000);
+        TEST_SLEEP(1);
         testclass.color.setOnoffLinear(false);
-        TEST_SLEEP(2000);
+        TEST_SLEEP(2);
         testclass.color.setOnoffLinear(true);
         testclass.color.setColorLoop<colorType::HSV>(3600, false);
-        TEST_SLEEP(3000);
+        TEST_SLEEP(3);
     }
 
 }

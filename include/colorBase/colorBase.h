@@ -29,7 +29,7 @@ struct ColorBaseType {
         return *this;
     }
 protected:
-    virtual void assign(const ColorBaseType<T>& src) = 0;
+    virtual void assign(const ColorBaseType<T> &src) = 0;
 }; /* struct ColorBaseType */
 
 template <colorType>
@@ -51,12 +51,30 @@ struct Color<colorType::RGB> : public ColorBaseType<colorType::RGB> {
     Color(uint8_t r, uint8_t g, uint8_t b) : val{r, g, b} {}
     Color() : val{0, 0, 0} {}
     
+    bool operator==(const Color<colorType::RGB> &rgb) const
+    {
+        return this->val.r == rgb.val.r && this->val.g == rgb.val.g && this->val.b == rgb.val.g;
+    }
+
+    inline bool isOn() const
+    {
+        return (this->val.r || this->val.g || this->val.b);
+    }
+
+    inline Color<colorType::RGB> &setMax()
+    {
+        this->val.r = 255;
+        this->val.g = 255;
+        this->val.b = 255;
+        return *this;
+    }
 protected:
-    void assign(const ColorBaseType<colorType::RGB>& src) override
+    void assign(const ColorBaseType<colorType::RGB> &src) override
     {
         const Color<colorType::RGB>* pSrc = static_cast<const Color<colorType::RGB> *>(&src);
         val = pSrc->val;
     }
+    
 };
 
 template <>
@@ -69,17 +87,36 @@ struct Color<colorType::HSV> : public ColorBaseType<colorType::HSV> {
         /* 0-100 */
         uint8_t v;
     } __attribute__((aligned(sizeof(void *))));
-
+    
     _HSV val;
 
     Color(uint16_t h, uint8_t s, uint8_t v) : val{h, s, v} {}
     Color() : val{0, 0, 0} {}
+
+    bool operator==(const Color<colorType::HSV> &hsv) const
+    {
+        return this->val.h == hsv.val.h && this->val.s == hsv.val.s && this->val.v == hsv.val.v;
+    }
+
+    inline bool isOn() const
+    {
+        return (this->val.s && this->val.v);
+    }
+
+    inline Color<colorType::HSV> &setMax()
+    {
+        this->val.h = 359;
+        this->val.s = 100;
+        this->val.v = 100;
+        return *this;
+    }
 protected:
-    void assign(const ColorBaseType<colorType::HSV>& src) override
+    inline void assign(const ColorBaseType<colorType::HSV> &src) override
     {
         const Color<colorType::HSV>* pSrc = static_cast<const Color<colorType::HSV> *>(&src);
         val = pSrc->val;
     }
+    
 };
 
 template <>
@@ -96,12 +133,29 @@ struct Color<colorType::CCTB> : public ColorBaseType<colorType::CCTB> {
     Color(uint16_t cct, uint16_t b) : val{cct, b} {}
     Color() : val{0, 0} {}
 
+    bool operator==(const Color<colorType::CCTB> &cctb) const
+    {
+        return this->val.cct == cctb.val.cct && this->val.b == cctb.val.b;
+    }
+
+    inline bool isOn() const
+    {
+        return (bool)this->val.b;
+    }
+
+    inline Color<colorType::CCTB> &setMax()
+    {
+        this->val.cct = 100;
+        this->val.b = 100;
+        return *this;
+    }
 protected:
     void assign(const ColorBaseType<colorType::CCTB>& src) override
     {
         const Color<colorType::CCTB>* pSrc = static_cast<const Color<colorType::CCTB> *>(&src);
         val = pSrc->val;
     }
+    
 }; 
 
 template <>
@@ -118,12 +172,29 @@ struct Color<colorType::CW> : public ColorBaseType<colorType::CW> {
     Color(uint16_t c, uint16_t w) : val{c, w} {}
     Color() : val{0, 0} {}
 
+    bool operator==(const Color<colorType::CW> &cw) const 
+    {
+        return this->val.c == cw.val.c && this->val.w == cw.val.w;
+    }
+    
+    inline bool isOn() const
+    {
+        return (this->val.c || this->val.w);
+    }
+
+    inline Color<colorType::CW> &setMax()
+    {
+        this->val.c = 255;
+        this->val.w = 255;
+        return *this;
+    }
 protected:
     void assign(const ColorBaseType<colorType::CW>& src) override
     {
         const Color<colorType::CW>* pSrc = static_cast<const Color<colorType::CW> *>(&src);
         val = pSrc->val;
     }
+    
 }; /* struct Color */
 
 
@@ -258,7 +329,8 @@ public:
     inline std::map<int, int> *getGammaMap() { return &this->gammaTable; };
 
     static inline int getRandom(int min, int max) { return colorBase::colorBasePortMgr::getRandom(min, max); }
-   
+    
+    void debugPrintMgrAllInfos();
 private:
     
     colorType colorMode;

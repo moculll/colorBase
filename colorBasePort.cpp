@@ -8,7 +8,7 @@
 #if COLORBASEPORT_PRINT
 #define CBD_PRINT(format, ...) \
             do { \
-                printf("[%s %d][%s]: " format "\r\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
+                printf("[%d][%s]: " format "\r\n", __LINE__, __func__, ##__VA_ARGS__); \
             } while(0)
 #else
 #define CBD_PRINT(format, ...)
