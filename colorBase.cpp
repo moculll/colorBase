@@ -139,25 +139,25 @@ void colorBaseMgr::debugPrintMgrAllInfos()
     CB_PRINT("----------------[Mgr Info Start]-----------------------------------------");
     CB_PRINT("colorMode: %d, effectMode: %d, onoff: %d", (int)this->colorMode, (int)this->effectMode, this->onoff ? 1 : 0);
     CB_PRINT("----------------[RGB]-----------------------------------------");
-    CB_PRINT("[rgb] %d %d %d, [prevColor] %d %d %d, [effectVal] linearStep: %d linearIntervalMs: %d linearMs: %d colorLoopMs: %d brightnessLoopMs: %d loopDirection: %d \
+    CB_PRINT("[rgb] %d %d %d, [prevColor] %d %d %d, [effectVal] linearStep: %ld linearIntervalMs: %ld linearMs: %ld colorLoopMs: %ld brightnessLoopMs: %ld loopDirection: %d \
     random: %d [target] %d %d %d", this->rgb.color.val.r, this->rgb.color.val.g, this->rgb.color.val.b, this->rgb.prevColor.val.r, this->rgb.prevColor.val.g, this->rgb.prevColor.val.b \
     , this->rgb.effectVal.linearStep, this->rgb.effectVal.linearIntervalMs, this->rgb.effectVal.linearMs, this->rgb.effectVal.colorLoopMs, this->rgb.effectVal.brightnessLoopMs, 
     this->rgb.effectVal.loopDirection, this->rgb.effectVal.random ? 1 : 0, this->rgb.effectVal.target.val.r, this->rgb.effectVal.target.val.g, this->rgb.effectVal.target.val.b);
     
     CB_PRINT("----------------[HSV]-----------------------------------------");
-    CB_PRINT("[hsv] %d %d %d, [prevColor] %d %d %d, [effectVal] linearStep: %d linearIntervalMs: %d linearMs: %d colorLoopMs: %d brightnessLoopMs: %d loopDirection: %d \
+    CB_PRINT("[hsv] %d %d %d, [prevColor] %d %d %d, [effectVal] linearStep: %ld linearIntervalMs: %ld linearMs: %ld colorLoopMs: %ld brightnessLoopMs: %ld loopDirection: %d \
     random: %d [target] %d %d %d", this->hsv.color.val.h, this->hsv.color.val.s, this->hsv.color.val.v, this->hsv.prevColor.val.h, this->hsv.prevColor.val.s, this->hsv.prevColor.val.v \
     , this->hsv.effectVal.linearStep, this->hsv.effectVal.linearIntervalMs, this->hsv.effectVal.linearMs, this->hsv.effectVal.colorLoopMs, this->hsv.effectVal.brightnessLoopMs, 
     this->hsv.effectVal.loopDirection, this->hsv.effectVal.random ? 1 : 0, this->hsv.effectVal.target.val.h, this->hsv.effectVal.target.val.s, this->hsv.effectVal.target.val.v);
 
     CB_PRINT("----------------[CCTB]-----------------------------------------");
-    CB_PRINT("[cctb] %d %d, [prevColor] %d %d, [effectVal] linearStep: %d linearIntervalMs: %d linearMs: %d colorLoopMs: %d brightnessLoopMs: %d loopDirection: %d \
+    CB_PRINT("[cctb] %d %d, [prevColor] %d %d, [effectVal] linearStep: %ld linearIntervalMs: %ld linearMs: %ld colorLoopMs: %ld brightnessLoopMs: %ld loopDirection: %d \
     random: %d [target] %d %d", this->cctb.color.val.cct, this->cctb.color.val.b, this->cctb.prevColor.val.cct, this->cctb.prevColor.val.b \
     , this->cctb.effectVal.linearStep, this->cctb.effectVal.linearIntervalMs, this->cctb.effectVal.linearMs, this->cctb.effectVal.colorLoopMs, this->cctb.effectVal.brightnessLoopMs, 
     this->cctb.effectVal.loopDirection, this->cctb.effectVal.random ? 1 : 0, this->cctb.effectVal.target.val.cct, this->cctb.effectVal.target.val.b);
 
     CB_PRINT("----------------[CW]-----------------------------------------");
-    CB_PRINT("[cw] %d %d, [prevColor] %d %d, [effectVal] linearStep: %d linearIntervalMs: %d linearMs: %d colorLoopMs: %d brightnessLoopMs: %d loopDirection: %d \
+    CB_PRINT("[cw] %d %d, [prevColor] %d %d, [effectVal] linearStep: %ld linearIntervalMs: %ld linearMs: %ld colorLoopMs: %ld brightnessLoopMs: %ld loopDirection: %d \
     random: %d [target] %d %d", this->cw.color.val.c, this->cw.color.val.w, this->cw.prevColor.val.c, this->cw.prevColor.val.w \
     , this->cw.effectVal.linearStep, this->cw.effectVal.linearIntervalMs, this->cw.effectVal.linearMs, this->cw.effectVal.colorLoopMs, this->cw.effectVal.brightnessLoopMs, 
     this->cw.effectVal.loopDirection, this->cw.effectVal.random ? 1 : 0, this->cw.effectVal.target.val.c, this->cw.effectVal.target.val.w);
@@ -291,8 +291,8 @@ void colorBaseMgr::setColor(const Color<colorType::RGB> &tar)
 {
     bool nextOnoff = tar.isOn() ? true : false;
     
-    if(this->onoff == nextOnoff && !nextOnoff \
-        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
+    if((this->onoff == nextOnoff && !nextOnoff \
+        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR)) \
         || (this->rgb.color == tar) \
     ) return;
     this->onoff = true;
@@ -311,8 +311,8 @@ void colorBaseMgr::setColor(const Color<colorType::HSV> &tar)
 {
     bool nextOnoff = tar.isOn() ? true : false;
     
-    if(this->onoff == nextOnoff && !nextOnoff \
-        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
+    if((this->onoff == nextOnoff && !nextOnoff \
+        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR)) \
         || (this->hsv.color == tar) \
     ) return;
     this->onoff = true;
@@ -332,8 +332,8 @@ void colorBaseMgr::setColor(const Color<colorType::CCTB> &tar)
 {
     bool nextOnoff = tar.isOn() ? true : false;
     
-    if(this->onoff == nextOnoff && !nextOnoff \
-        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
+    if((this->onoff == nextOnoff && !nextOnoff \
+        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR)) \
         || (this->cctb.color == tar) \
     ) return;
     this->onoff = true;
@@ -353,8 +353,8 @@ void colorBaseMgr::setColor(const Color<colorType::CW> &tar)
 {
     bool nextOnoff = tar.isOn() ? true : false;
     
-    if(this->onoff == nextOnoff && !nextOnoff \
-        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
+    if((this->onoff == nextOnoff && !nextOnoff \
+        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR)) \
         || (this->cw.color == tar) \
     ) return;
     this->onoff = true;
@@ -397,8 +397,8 @@ void colorBaseMgr::setColorLinear(const Color<colorType::RGB> &tar)
     using linearCallbackType = void (*)(void *);
     bool nextOnoff = tar.isOn() ? true : false;
     CB_PRINT("current onoff: %d", this->onoff ? 1 : 0);
-    if(this->onoff == nextOnoff && !nextOnoff \
-        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
+    if((this->onoff == nextOnoff && !nextOnoff \
+        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR)) \
         || (this->rgb.color == tar) \
     ) return;
     if(!nextOnoff) {
@@ -414,7 +414,7 @@ void colorBaseMgr::setColorLinear(const Color<colorType::RGB> &tar)
     CB_PRINT("target: %d %d %d", this->rgb.effectVal.target.val.r, this->rgb.effectVal.target.val.g, this->rgb.effectVal.target.val.b);
     CB_PRINT("current: %d %d %d", this->rgb.color.val.r, this->rgb.color.val.g, this->rgb.color.val.b);
     this->rgb.effectVal.linearStep = this->rgb.effectVal.linearMs / this->rgb.effectVal.linearIntervalMs;
-    CB_PRINT("linearStep: %d", this->rgb.effectVal.linearStep);
+    CB_PRINT("linearStep: %ld", this->rgb.effectVal.linearStep);
 
     this->portMgr.timer.setExecuteTime(this->rgb.effectVal.linearIntervalMs);
     
@@ -451,8 +451,8 @@ void colorBaseMgr::setColorLinear(const Color<colorType::HSV> &tar)
     using linearCallbackType = void (*)(void *);
     bool nextOnoff = tar.isOn() ? true : false;
     
-    if(this->onoff == nextOnoff && !nextOnoff \
-        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
+    if((this->onoff == nextOnoff && !nextOnoff \
+        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR)) \
         || (this->hsv.color == tar) \
     ) return;
 
@@ -470,7 +470,7 @@ void colorBaseMgr::setColorLinear(const Color<colorType::HSV> &tar)
     CB_PRINT("target: %d %d %d", this->hsv.effectVal.target.val.h, this->hsv.effectVal.target.val.s, this->hsv.effectVal.target.val.v);
     CB_PRINT("current: %d %d %d", this->hsv.color.val.h, this->hsv.color.val.s, this->hsv.color.val.v);
     this->hsv.effectVal.linearStep = this->hsv.effectVal.linearMs / this->hsv.effectVal.linearIntervalMs;
-    CB_PRINT("linearStep: %d", this->hsv.effectVal.linearStep);
+    CB_PRINT("linearStep: %ld", this->hsv.effectVal.linearStep);
 
     this->portMgr.timer.setExecuteTime(this->hsv.effectVal.linearIntervalMs);
     
@@ -506,8 +506,8 @@ void colorBaseMgr::setColorLinear(const Color<colorType::CCTB> &tar)
     using linearCallbackType = void (*)(void *);
 
     bool nextOnoff = tar.isOn() ? true : false;
-    if(this->onoff == nextOnoff && !nextOnoff \
-        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
+    if((this->onoff == nextOnoff && !nextOnoff \
+        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR)) \
         || (this->cctb.color == tar) \
     ) return;
 
@@ -525,7 +525,7 @@ void colorBaseMgr::setColorLinear(const Color<colorType::CCTB> &tar)
     CB_PRINT("target: %d %d", this->cctb.effectVal.target.val.cct, this->cctb.effectVal.target.val.b);
     CB_PRINT("current: %d %d", this->cctb.color.val.cct, this->cctb.color.val.b);
     this->cctb.effectVal.linearStep = this->cctb.effectVal.linearMs / this->cctb.effectVal.linearIntervalMs;
-    CB_PRINT("linearStep: %d", this->cctb.effectVal.linearStep);
+    CB_PRINT("linearStep: %ld", this->cctb.effectVal.linearStep);
 
     this->portMgr.timer.setExecuteTime(this->cctb.effectVal.linearIntervalMs);
     
@@ -559,8 +559,8 @@ void colorBaseMgr::setColorLinear(const Color<colorType::CW> &tar)
 
     bool nextOnoff = tar.isOn() ? true : false;
 
-    if(this->onoff == nextOnoff && !nextOnoff \
-        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR) \
+    if((this->onoff == nextOnoff && !nextOnoff \
+        && (this->effectMode != colorEffectMode::NORMAL && this->effectMode != colorEffectMode::LINEAR)) \
         || (this->cw.color == tar) \
     ) return;
 
@@ -578,7 +578,7 @@ void colorBaseMgr::setColorLinear(const Color<colorType::CW> &tar)
     CB_PRINT("target: %d %d", this->cw.effectVal.target.val.c, this->cw.effectVal.target.val.w);
     CB_PRINT("current: %d %d", this->cw.color.val.c, this->cw.color.val.w);
     this->cw.effectVal.linearStep = this->cw.effectVal.linearMs / this->cw.effectVal.linearIntervalMs;
-    CB_PRINT("linearStep: %d", this->cw.effectVal.linearStep);
+    CB_PRINT("linearStep: %ld", this->cw.effectVal.linearStep);
 
     this->portMgr.timer.setExecuteTime(this->cw.effectVal.linearIntervalMs);
     
@@ -738,4 +738,5 @@ void colorBaseMgr::getColor(Color<colorType::CW> &dst)
 }
 
 } /* colorBase */
+
 
